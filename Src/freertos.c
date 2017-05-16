@@ -55,6 +55,7 @@
 osThreadId defaultTaskHandle;
 osThreadId myTask02Handle;
 osThreadId myTask03Handle;
+osThreadId myTaskCommandLineListenerHandle;
 osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
 osMutexId myMutex01Handle;
@@ -68,6 +69,7 @@ osSemaphoreId myCountingSem01Handle;
 void StartDefaultTask(void const * argument);
 void StartTask02(void const * argument);
 void StartTask03(void const * argument);
+void StartCommandLineListener(void const *argument);
 void Callback01(void const * argument);
 
 extern void MX_FATFS_Init(void);
@@ -122,16 +124,20 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+/*  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);*/
 
   /* definition and creation of myTask02 */
-  osThreadDef(myTask02, StartTask02, osPriorityNormal, 0, 512);
-  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
+/*  osThreadDef(myTask02, StartTask02, osPriorityNormal, 0, 512);
+  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);*/
 
   /* definition and creation of myTask03 */
-  osThreadDef(myTask03, StartTask03, osPriorityNormal, 0, 512);
-  myTask03Handle = osThreadCreate(osThread(myTask03), NULL);
+/*  osThreadDef(myTask03, StartTask03, osPriorityNormal, 0, 512);
+  myTask03Handle = osThreadCreate(osThread(myTask03), NULL);*/
+
+  /* definition and creation of CommandLineListener task */
+  osThreadDef(CommandLineListenerTask, StartCommandLineListener, osPriorityNormal, 0, 512);
+  myTaskCommandLineListenerHandle = osThreadCreate(osThread(CommandLineListenerTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -179,6 +185,11 @@ void StartTask03(void const * argument)
   osDelay(200);
   Ass_03_Task_03(argument);
   /* USER CODE END StartTask03 */
+}
+
+/* StartCommandLineListener function */
+void StartCommandLineListener(void const *argument){
+	CommandLineListener(argument);
 }
 
 /* Callback01 function */
