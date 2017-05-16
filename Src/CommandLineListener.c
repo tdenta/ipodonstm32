@@ -29,17 +29,11 @@ void CommandLineListener(void const * argument)
   BSP_LCD_DisplayStringAt(5,50, (uint8_t*)"Sorry, no touch panel this time",LEFT_MODE);
 
   WriteConsole((uint8_t *)"Hello from Task 1\n");
-
+  WriteConsole((uint8_t *)"After\n");
   CommandLineParserInit();
 
   while (1)
   {
-	  //CommandLineParserProcess();
-
-	  if (i++ > 10000)
-	  {
-		  HAL_GPIO_TogglePin(GPIOD, LD3_Pin); // Toggle LED3
-		  i=0;
-	  }
+	  CommandLineParserProcess();
   }
 }

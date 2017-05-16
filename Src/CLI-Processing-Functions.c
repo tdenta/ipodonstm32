@@ -26,9 +26,9 @@ int8_t BufferCursor = 0;
 
 void CommandLineParserInit(void)
 {
-  // Print welcome message
-  WriteConsole((uint8_t *)"\014");
-  WriteConsole((uint8_t *)"\n>>> Enter a command > ");
+	// Print welcome message
+	//WriteConsole((uint8_t *)"\014");
+	WriteConsole((uint8_t *)"\n>>> Enter a command > ");
 }
 
 /*
@@ -48,7 +48,9 @@ void CommandLineParserProcess(void)
 	if (HAL_UART_Receive(&huart2, &c, 1, 0x0) == HAL_OK)
 	{
 		HAL_GPIO_TogglePin(GPIOD, LD4_Pin); // Toggle LED4
-		printf("%c",c);
+		char prt1[2];
+		sprintf(prt1,"%c",c);
+		WriteConsole((uint8_t *)prt1);
 
 		//Verify first that \n is being passed or not in order not to put it in the buffer (avoids extra processing)
 		//13 is ascii code for new line
@@ -85,7 +87,7 @@ void CommandLineParserProcess(void)
 				//Process the arguments array and return the result (if any) in the output variable
 				double output=0;
 				int8_t ErrorCode = ProcessArgString(&output, WordCount, (uint8_t**)InputWordsArray);
-				printf("\n>>> Enter a command > ");
+				WriteConsole((uint8_t *)"\n>>> Enter a command > ");
 
 				//DEBUG CODE
 				//printf("Got the output: %f and error code %d \n", output, ErrorCode);
@@ -130,7 +132,14 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 		const command_s* Command_p = GetCommandByName((int8_t*)ArgsArray[0]);
 
 		if(Command_p == NULL){
-			printf(RED "\nCommand \"%s\" not found.\n" RESET, ArgsArray[0]);
+
+			//http://stackoverflow.com/questions/1775403/using-snprintf-to-avoid-buffer-overruns
+			size_t cn = snprintf(NULL, 0, RED "\nCommand \"%s\" not found.\n" RESET, ArgsArray[0]);
+			char  *prt = malloc(cn+1);
+			sprintf(prt, RED "\nCommand \"%s\" not found.\n" RESET, ArgsArray[0]);
+			WriteConsole((uint8_t*)prt);
+			free(prt);
+
 			ReturnCode = -1;
 		}else{
 			//Call the actual function implementing the command
@@ -147,7 +156,11 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 		}
 
 	}else{
-		printf(RED "Please type something.\n" RESET);
+		size_t cn = snprintf(NULL, 0, RED "Please type something.\n" RESET);
+		char  *prt = malloc(cn+1);
+		sprintf(prt, RED "Please type something.\n" RESET);
+		WriteConsole((uint8_t*)prt);
+		free(prt);
 		ReturnCode = -3;
 	}
 	return ReturnCode;
