@@ -59,6 +59,7 @@ osThreadId myTaskCommandLineListenerHandle;
 osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
 osMutexId myMutex01Handle;
+osMutexId serialMutexHandle;
 osSemaphoreId myBinarySem01Handle;
 osSemaphoreId myCountingSem01Handle;
 
@@ -94,7 +95,10 @@ void MX_FREERTOS_Init(void) {
   myMutex01Handle = osMutexCreate(osMutex(myMutex01));
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+
+  osMutexDef(serialMutex);
+  serialMutexHandle = osMutexCreate(osMutex(serialMutex));
+
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */

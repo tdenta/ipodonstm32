@@ -28,12 +28,12 @@ void CommandLineListener(void const * argument)
   BSP_LCD_DisplayStringAt(5,35, (uint8_t*)"Up/down frequency, centre reset",LEFT_MODE);
   BSP_LCD_DisplayStringAt(5,50, (uint8_t*)"Sorry, no touch panel this time",LEFT_MODE);
 
-  WriteConsole((uint8_t *)"Hello from Task 1\n");
-  WriteConsole((uint8_t *)"After\n");
   CommandLineParserInit();
+  WriteConsole((uint8_t*)"Init done");
 
   while (1)
   {
+	  WriteConsole((uint8_t*)"Entering parser process");
 	  CommandLineParserProcess();
   }
 }

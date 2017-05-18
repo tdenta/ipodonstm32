@@ -29,6 +29,7 @@ void CommandLineParserInit(void)
 	// Print welcome message
 	//WriteConsole((uint8_t *)"\014");
 	WriteConsole((uint8_t *)"\n>>> Enter a command > ");
+	WriteConsole((uint8_t *)"\nyhgsdfhgbfvhfgvbshfv hfdgsdhgfs hsdfg shfg sdhfg hjg fsg");
 }
 
 /*
@@ -43,57 +44,86 @@ void CommandLineParserProcess(void)
 {
 	uint8_t c;
 
-	//Next section of the code: fill the buffer with received characters, either from UART of from STDIN
+	//Next section of the code: fill the buffer with received characters from UART
+
+	//PRINT TO CONSOLE
+	size_t cn1 = snprintf(NULL, 0, RED "Reached just before reading\n" RESET);
+	char  *prt1 = malloc(cn1+1);
+	sprintf(prt1, RED "Reached just before reading\n" RESET);
+	WriteConsole((uint8_t*)prt1);
+	free(prt1);
+	//END PRINT TO CONSOLE
 
 	//ReadConsole is interrupt driven: the thread will stop executing itself here and wait for characters to come (no polling anymore)
 	ReadConsole(&c);
 
-	char prt1[2];
+	//Print back the character being read
+	/*char prt1[2];
 	sprintf(prt1,"%c",c);
-	WriteConsole((uint8_t *)prt1);
+	WriteConsole((uint8_t *)prt1);*/
 
-	//Verify first that \n is being passed or not in order not to put it in the buffer (avoids extra processing)
-	//13 is ascii code for new line
-	if(c == 13){
+	//PRINT TO CONSOLE
+	size_t cn = snprintf(NULL, 0, "%c",c);
+	char  *prt = malloc(cn+1);
+	sprintf(prt, "%c",c);
+	WriteConsole((uint8_t*)prt);
+	free(prt);
+	//END PRINT TO CONSOLE
 
-		if(BufferCursor == BUFFER_MAX_SIZE){//In case of buffer overflow we cannot get the entire command typed
-			printf(RED "Buffer overflow! Type a shorter command!\n" RESET);
-		}
-		else
-		{
-			//DEBUG CODE
-			//printf(CYN"Got the following string \"%s\"\n"RESET,buffer);
-			//printf("Buffer: %s\n", buffer);
+	if(BufferCursor == BUFFER_MAX_SIZE){//In case of buffer overflow we cannot get the entire command typed
 
-			//Pass the received string in the buffer to the string parser for word splitting
-			char** InputWordsArray;
-			int WordCount = string_parser((char*)&buffer, (char***)&InputWordsArray);
+		//PRINT TO CONSOLE
+		size_t cn = snprintf(NULL, 0, RED "Buffer overflow! Type a shorter command!\n" RESET);
+		char  *prt = malloc(cn+1);
+		sprintf(prt, RED "Buffer overflow! Type a shorter command!\n" RESET);
+		WriteConsole((uint8_t*)prt);
+		free(prt);
+		//END PRINT TO CONSOLE
 
-			//DEBUG CODE
-			//printf("Word count got: %d \n", WordCount);
+		//Cleaning buffer for next use: putting spaces in the buffer to make sure last command won't be re-executed
+		//Null terminate at the beginning in case of any string-related operations on the buffer
+		//Reset the cursor to zero for next buffer-filling
+		memset(buffer,' ',sizeof(buffer));
+		buffer[0] = '\0';
+		BufferCursor = 0;
+		WriteConsole((uint8_t *)"\n>>> Enter a command > ");
 
-			//Cleaning buffer for next use: putting spaces in the buffer to make sure last command won't be re-executed
-			//Null terminate at the beginning in case of any string-related operations on the buffer
-			//Reset the cursor to zero for next buffer-filling
-			memset(buffer,' ',sizeof(buffer));
-			buffer[0] = '\0';
-			BufferCursor = 0;
+		//Verify then that \n is being passed or not in order not to put it in the buffer (avoids extra processing)
+		//13 is ascii code for new line
+	}else if(c == 13){
 
-			//DEBUG CODE
-			//for(int i=0; i<WordCount;i++){
-			//	printf("Argument number %d: %s\n", i, InputWordsArray[i]);
-			//}
+		//DEBUG CODE
+		//printf(CYN"Got the following string \"%s\"\n"RESET,buffer);
+		//printf("Buffer: %s\n", buffer);
 
-			//Process the arguments array and return the result (if any) in the output variable
-			double output=0;
-			int8_t ErrorCode = ProcessArgString(&output, WordCount, (uint8_t**)InputWordsArray);
-			WriteConsole((uint8_t *)"\n>>> Enter a command > ");
+		//Pass the received string in the buffer to the string parser for word splitting
+		char** InputWordsArray;
+		int WordCount = string_parser((char*)&buffer, (char***)&InputWordsArray);
 
-			//DEBUG CODE
-			//printf("Got the output: %f and error code %d \n", output, ErrorCode);
-		}
-	}
-	else{
+		//DEBUG CODE
+		//printf("Word count got: %d \n", WordCount);
+
+		//Cleaning buffer for next use: putting spaces in the buffer to make sure last command won't be re-executed
+		//Null terminate at the beginning in case of any string-related operations on the buffer
+		//Reset the cursor to zero for next buffer-filling
+		memset(buffer,' ',sizeof(buffer));
+		buffer[0] = '\0';
+		BufferCursor = 0;
+
+		//DEBUG CODE
+		//for(int i=0; i<WordCount;i++){
+		//	printf("Argument number %d: %s\n", i, InputWordsArray[i]);
+		//}
+
+		//Process the arguments array and return the result (if any) in the output variable
+		double output=0;
+		int8_t ErrorCode = ProcessArgString(&output, WordCount, (uint8_t**)InputWordsArray);
+		WriteConsole((uint8_t *)"\n>>> Enter a command > ");
+
+		//DEBUG CODE
+		//printf("Got the output: %f and error code %d \n", output, ErrorCode);
+
+	}else{
 		//Buffer filling code
 		//The current character is not a new line and can be added to the buffer
 		//Pressing ENTER causes the \n character to be passed and the command processing to be fired
@@ -105,8 +135,6 @@ void CommandLineParserProcess(void)
 		//DEBUG CODE
 		//printf("Contents of buffer: %s\n", buffer);
 	}
-
-
 }
 
 /*
