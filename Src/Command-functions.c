@@ -45,7 +45,13 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			//Returning the result of the function inside an external integer
 			*out = result;
 
-			printf("%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
+			//PRINT TO CONSOLE
+			size_t cn = snprintf(NULL, 0, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
+			char  *prt = malloc(cn+1);
+			sprintf(prt, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
+			WriteConsole((uint8_t*)prt);
+			free(prt);
+			//END PRINT TO CONSOLE
 
 			//Success return code
 			return 1;
@@ -64,17 +70,39 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			float result = digit1 - digit2;
 			*out = result;
 
-			printf("%f - %f = %f \n", digit1, digit2, result);
+			//PRINT TO CONSOLE
+			size_t cn = snprintf(NULL, 0, "%f - %f = %f \n", digit1, digit2, result);
+			char  *prt = malloc(cn+1);
+			sprintf(prt, "%f - %f = %f \n", digit1, digit2, result);
+			WriteConsole((uint8_t*)prt);
+			free(prt);
+			//END PRINT TO CONSOLE
 
 			//Success return code
 			return 1;
 		}else{
-			printf(RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
+
+			//PRINT TO CONSOLE
+			size_t cn = snprintf(NULL, 0, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
+			char  *prt = malloc(cn+1);
+			sprintf(prt, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
+			WriteConsole((uint8_t*)prt);
+			free(prt);
+			//END PRINT TO CONSOLE
+
 			//Error return code
 			return 0;
 		}
 	}else{
-		printf(RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
+
+		//PRINT TO CONSOLE
+		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
+		char  *prt = malloc(cn+1);
+		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
+		WriteConsole((uint8_t*)prt);
+		free(prt);
+		//END PRINT TO CONSOLE
+
 		//Error return code
 		return 0;
 	}
@@ -120,7 +148,13 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			return 0;
 		}
 	}else{
-		printf(RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
+		//PRINT TO CONSOLE
+		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
+		char  *prt = malloc(cn+1);
+		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
+		WriteConsole((uint8_t*)prt);
+		free(prt);
+		//END PRINT TO CONSOLE
 		//Error return code
 		return 0;
 	}
@@ -156,7 +190,13 @@ int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		}
 
 	}else{
-		printf(RED "The number of arguments is not correct.\nUsage: help help\n" RESET);
+		//PRINT TO CONSOLE
+		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help help\n" RESET);
+		char  *prt = malloc(cn+1);
+		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help help\n" RESET);
+		WriteConsole((uint8_t*)prt);
+		free(prt);
+		//END PRINT TO CONSOLE
 		//Error return code
 		return 0;
 	}
@@ -241,7 +281,13 @@ int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			return 0;
 		}
 	}else{
-		printf(RED "The number of arguments is not correct.\nUsage: help div\n" RESET);
+		//PRINT TO CONSOLE
+		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help div\n" RESET);
+		char  *prt = malloc(cn+1);
+		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help div\n" RESET);
+		WriteConsole((uint8_t*)prt);
+		free(prt);
+		//END PRINT TO CONSOLE
 		//Error return code
 		return 0;
 	}
@@ -316,7 +362,13 @@ int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		return 1;
 
 	}else{
-		printf(RED "The number of arguments is not correct.\nUsage: help list\n" RESET);
+		//PRINT TO CONSOLE
+		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help list\n" RESET);
+		char  *prt = malloc(cn+1);
+		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help list\n" RESET);
+		WriteConsole((uint8_t*)prt);
+		free(prt);
+		//END PRINT TO CONSOLE
 		//Error return code
 		return 0;
 	}
