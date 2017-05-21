@@ -36,7 +36,7 @@ extern osTimerId myTimer01Handle;
 extern osSemaphoreId myBinarySem01Handle;
 extern osMessageQId myQueue01Handle;
 extern osMutexId myMutex01Handle;
-extern osMutexId serialMutexHandle;
+extern osMutexId audioBufferMutexHandle;
 
 // Assignment tasks
 extern void Ass_03_Task_01(void const *argument);
@@ -98,5 +98,6 @@ extern int8_t AddFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
+extern int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 
 #endif /* ASS_03_H_ */

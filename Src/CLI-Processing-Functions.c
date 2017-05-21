@@ -15,6 +15,7 @@ const command_s CommandList[] = {
 		{(int8_t*) "div", &DivFunction, (int8_t*)"div <num1> <num2>"},
 		{(int8_t*) "mul", &MulFunction, (int8_t*)"mul <num1> <num2>"},
 		{(int8_t*) "list", &ListFunction, (int8_t*)"list _no-arguments_"},
+		{(int8_t*) "tone", &ToneFunction, (int8_t*) "tone <frequency[Hz]> <duration[s]>"},
 		{NULL, NULL, NULL}
 };
 
@@ -72,7 +73,7 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 			if(CommandResult == 0){
 
 				//PRINT TO CONSOLE
-				sprintf(stringDump2,  "An error has occurred executing the command.\n" );
+				sprintf(stringDump2,  RED"An error has occurred executing the command.\n"RESET );
 				WriteConsole((uint8_t*)stringDump2);
 				//END PRINT TO CONSOLE
 
@@ -81,7 +82,7 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 		}
 
 	}else{
-		sprintf(stringDump2,  "Please type something.\n" );
+		sprintf(stringDump2, YEL "Please type something.\n"RESET );
 		WriteConsole((uint8_t*)stringDump2);
 		ReturnCode = -3;
 	}

@@ -59,7 +59,7 @@ osThreadId myTaskCommandLineListenerHandle;
 osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
 osMutexId myMutex01Handle;
-osMutexId serialMutexHandle;
+osMutexId audioBufferMutexHandle;
 osSemaphoreId myBinarySem01Handle;
 osSemaphoreId myCountingSem01Handle;
 
@@ -96,8 +96,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_MUTEX */
 
-  osMutexDef(serialMutex);
-  serialMutexHandle = osMutexCreate(osMutex(serialMutex));
+  osMutexDef(audioBufferMutex);
+  audioBufferMutexHandle = osMutexCreate(osMutex(audioBufferMutex));
 
   /* USER CODE END RTOS_MUTEX */
 
@@ -132,8 +132,8 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myTask02 */
-/*  osThreadDef(myTask02, StartTask02, osPriorityNormal, 0, 512);
-  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);*/
+  osThreadDef(myTask02, StartTask02, osPriorityNormal, 0, 512);
+  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
 
   /* definition and creation of myTask03 */
 /*  osThreadDef(myTask03, StartTask03, osPriorityNormal, 0, 512);

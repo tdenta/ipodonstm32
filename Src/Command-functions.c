@@ -167,30 +167,28 @@ int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 		//Debug messages display depends on DebugLevel variable
 		if(DebugLevel){
-			printf(GRN "Correct argument number detected : %d \n" RESET, ArgNum);
+			sprintf(stringDump3, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump3);
 		}
 
 		//Search for the command being asked for help
 		const command_s* Command_p = GetCommandByName((int8_t*)ArgStrings[0]);
 
 		if(Command_p == NULL){
-			printf(RED "Command \"%s\" not found.\n" RESET, ArgStrings[0]);
+			sprintf(stringDump3, RED "Command \"%s\" not found.\n" RESET, ArgStrings[0]);
+			WriteConsole((uint8_t*)stringDump3);
 			return 0;
 		}else{
 
 			//Print the actual function's help message
-			printf(CYN "Usage: %s \n" RESET, (char*)Command_p->HelpString);
+			sprintf(stringDump3, CYN "Usage: %s \n" RESET, (char*)Command_p->HelpString);
+			WriteConsole((uint8_t*)stringDump3);
 			return 1;
 		}
 
 	}else{
-		//PRINT TO CONSOLE
-		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help help\n" RESET);
-		char  *prt = malloc(cn+1);
-		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help help\n" RESET);
-		WriteConsole((uint8_t*)prt);
-		free(prt);
-		//END PRINT TO CONSOLE
+		sprintf(stringDump3, RED "The number of arguments is not correct. Usage: help help" RESET);
+		WriteConsole((uint8_t*)stringDump3);
 		//Error return code
 		return 0;
 	}
@@ -367,3 +365,55 @@ int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		return 0;
 	}
 }
+
+int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+	if(ArgNum == 2){
+
+		if(DebugLevel){
+			sprintf(stringDump3, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump3);
+			osDelay(10);
+		}
+
+		if(IsNumber(ArgStrings[0]) && IsNumber(ArgStrings[1])){
+
+			if(DebugLevel){
+				sprintf(stringDump3, GRN "Arguments are numbers.\n" RESET);
+				WriteConsole((uint8_t*)stringDump3);
+			}
+
+			int ToneFrequency = 0;
+			int ToneDuration = 0;
+			int percent = 0;
+
+			//Convert arguments into numbers
+			sscanf((char*)ArgStrings[0], "%d", (int*)&ToneFrequency);
+			sscanf((char*)ArgStrings[1], "%d", (int*)&ToneDuration);
+
+			//Send message to change tone frequency
+			osMessagePut (myQueue01Handle, ToneFrequency, 0);
+
+			//Wait a number of seconds specified by ToneDuration and print every percent
+			while(percent++ < 100){
+				osDelay(floor(ToneDuration*10));
+				WriteConsole((uint8_t*)"#");
+			}
+
+			//Send message to end audio output (put zero frequency)
+			osMessagePut (myQueue01Handle, 0, 0);
+
+			return 1;
+		}else{
+			sprintf(stringDump3, RED "Arguments are not numbers.\n" RESET);
+			WriteConsole((uint8_t*)stringDump3);
+			return 0;
+		}
+
+	}else{
+		sprintf(stringDump3, RED "The number of arguments is not correct. Usage: help tone.\n" RESET);
+		WriteConsole((uint8_t*)stringDump3);
+		return 0;
+	}
+}
+
+
