@@ -9,7 +9,7 @@
 
 //DebugLevel variable is used for the debug mode
 uint8_t DebugLevel = 0;
-
+char stringDump3[300] ={0};
 
 /*
  * Function SubFunction
@@ -46,11 +46,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			*out = result;
 
 			//PRINT TO CONSOLE
-			size_t cn = snprintf(NULL, 0, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
-			char  *prt = malloc(cn+1);
-			sprintf(prt, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
-			WriteConsole((uint8_t*)prt);
-			free(prt);
+			sprintf(stringDump3, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
+			WriteConsole((uint8_t*)stringDump3);
 			//END PRINT TO CONSOLE
 
 			//Success return code
@@ -71,11 +68,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			*out = result;
 
 			//PRINT TO CONSOLE
-			size_t cn = snprintf(NULL, 0, "%f - %f = %f \n", digit1, digit2, result);
-			char  *prt = malloc(cn+1);
-			sprintf(prt, "%f - %f = %f \n", digit1, digit2, result);
-			WriteConsole((uint8_t*)prt);
-			free(prt);
+			sprintf(stringDump3, "%f - %f = %f \n", digit1, digit2, result);
+			WriteConsole((uint8_t*)stringDump3);
 			//END PRINT TO CONSOLE
 
 			//Success return code
@@ -83,11 +77,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		}else{
 
 			//PRINT TO CONSOLE
-			size_t cn = snprintf(NULL, 0, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
-			char  *prt = malloc(cn+1);
-			sprintf(prt, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
-			WriteConsole((uint8_t*)prt);
-			free(prt);
+			sprintf(stringDump3, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
+			WriteConsole((uint8_t*)stringDump3);
 			//END PRINT TO CONSOLE
 
 			//Error return code
@@ -96,11 +87,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}else{
 
 		//PRINT TO CONSOLE
-		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
-		char  *prt = malloc(cn+1);
-		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
-		WriteConsole((uint8_t*)prt);
-		free(prt);
+		sprintf(stringDump3, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
+		WriteConsole((uint8_t*)stringDump3);
 		//END PRINT TO CONSOLE
 
 		//Error return code
@@ -128,7 +116,10 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		if(!strcmp((char*)ArgStrings[0], "on")){
 
 			DebugLevel = 1;
-			printf(GRN "Debug ON\n" RESET);
+			//PRINT TO CONSOLE
+			sprintf(stringDump3, GRN "Debug ON\n" RESET);
+			WriteConsole((uint8_t*)stringDump3);
+			//END PRINT TO CONSOLE
 
 			//Success return code
 			return 1;
@@ -138,22 +129,25 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			//Printing output
 
 			DebugLevel = 0;
-			printf(YEL "Debug OFF\n" RESET);
+			//PRINT TO CONSOLE
+			sprintf(stringDump3, YEL "Debug OFF\n" RESET);
+			WriteConsole((uint8_t*)stringDump3);
+			//END PRINT TO CONSOLE
 
 			//Success return code
 			return 1;
 		}else{
-			printf(RED "Argument not recognized.\nUsage: help debug\n" RESET);
+			//PRINT TO CONSOLE
+			sprintf(stringDump3, RED "Argument not recognized.\nUsage: help debug\n" RESET);
+			WriteConsole((uint8_t*)stringDump3);
+			//END PRINT TO CONSOLE
 			//Error return code
 			return 0;
 		}
 	}else{
 		//PRINT TO CONSOLE
-		size_t cn = snprintf(NULL, 0, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
-		char  *prt = malloc(cn+1);
-		sprintf(prt, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
-		WriteConsole((uint8_t*)prt);
-		free(prt);
+		sprintf(stringDump3, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
+		WriteConsole((uint8_t*)stringDump3);
 		//END PRINT TO CONSOLE
 		//Error return code
 		return 0;

@@ -26,6 +26,7 @@ void WriteConsole(uint8_t *s)
 
 void ReadConsole(uint8_t *c)
 {
+
   HAL_UART_Receive_IT(&huart2, c, 1);
   osSemaphoreWait(myBinarySem01Handle, osWaitForever);
 }

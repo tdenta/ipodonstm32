@@ -32,7 +32,7 @@ void Ass_03_Task_01(void const * argument)
   BSP_LCD_DisplayStringAt(5,50, (uint8_t*)"Sorry, no touch panel this time",LEFT_MODE);
   osMutexRelease(myMutex01Handle);
 
-  WriteConsole((uint8_t *)"Hello from Task 1\n");
+  //WriteConsole((uint8_t *)"Hello from Task 1\n");
 
   while (1)
   {
