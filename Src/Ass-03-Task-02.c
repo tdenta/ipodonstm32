@@ -13,6 +13,7 @@ int16_t buffer[BUFF_SIZE];
 //int32_t b;
 int16_t frequency;
 int16_t amplitude;
+int8_t continueReadingFlag = 1;
 
 void Ass_03_Task_02(void const * argument)
 {
@@ -74,7 +75,9 @@ void Ass_03_Task_02(void const * argument)
 }
 
 // Call back function for DMA controller
-void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
-{
-  HAL_I2S_Transmit_DMA(&hi2s2, (uint16_t *)buffer, BUFF_SIZE);
-}
+//void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
+//{
+//	if(continueReadingFlag){
+//		HAL_I2S_Transmit_DMA(&hi2s2, (uint16_t *)buffer, BUFF_SIZE);
+//	}
+//}

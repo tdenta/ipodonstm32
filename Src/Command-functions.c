@@ -9,6 +9,8 @@
 
 //DebugLevel variable is used for the debug mode
 uint8_t DebugLevel = 0;
+
+//StringDump variable is used to output text to the serial port
 char stringDump3[300] ={0};
 
 /*
@@ -385,7 +387,8 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			int ToneFrequency = 0;
 			int ToneVolume = 50;
 			int ToneDuration = 0;
-			int percent = 0;
+			//int percent = 0;
+			int lastPlaybackSecond;
 
 			//Convert arguments into numbers
 			sscanf((char*)ArgStrings[0], "%d", (int*)&ToneFrequency);
@@ -404,7 +407,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				WriteConsole((uint8_t*)stringDump3);
 			}
 
-			//Send message to change tone frequency
+			/*//Send message to change tone frequency
 			osMessagePut (toneFrequencyQueueHandle, ToneFrequency, 0);
 
 			//Send message to change tone volume
@@ -416,8 +419,78 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				WriteConsole((uint8_t*)"#");
 			}
 
+			continueReadingFlag = 0;
 			//Send message to end audio output (put zero frequency)
-			osMessagePut (myQueue01Handle, 0, 0);
+			osMessagePut (toneFrequencyQueueHandle, 0, 0);
+
+			//Send message to put zero volume
+			osMessagePut (toneAmplitudeQueueHandle, 0, 0);*/
+
+			int16_t audioBuffer01[AUDIO_BUFFER_SIZE] = {0};
+			int16_t audioBuffer02[AUDIO_BUFFER_SIZE] = {0};
+
+			int16_t* previousBufferPtr = audioBuffer01;
+			int16_t* currentBufferPtr = audioBuffer01;
+
+			//Load initial buffer with new frequency sine wave
+			for (int i=0;i<AUDIO_BUFFER_SIZE;i++)
+			{
+				currentBufferPtr[i] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)i/(float)SAMPLE_FREQ*2*3.14));
+			}
+
+			//Signalling that DMA should be activated
+			osSignalSet(audioManagerTaskHandle, 0x01);
+
+			//Immediate signal clear to avoid trying to restart the DMA again
+			//Not needed as we wait for any signal to be set
+			//osSignalClear(audioManagerTaskHandle, 0x01);
+
+			//Initializing the audio duration for timer
+			audioSecondsRemaining = ToneDuration;
+			lastPlaybackSecond = audioSecondsRemaining;
+
+			 sprintf(stringDump3, "%d s ... \n", lastPlaybackSecond);
+			 WriteConsole((uint8_t*)stringDump3);
+
+			//Sending the pointer for the initial buffer to the audio manager
+			osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
+
+			//Starting playback timer
+			osTimerStart(audioPlaybackTimerHandle, 1000);
+
+			//The main idea is that the next buffer to play should always be available BEFORE the DMA fires the callback telling it's done with current data
+			while(audioSecondsRemaining>0){
+				if(previousBufferPtr == audioBuffer01){
+					currentBufferPtr = audioBuffer02;
+				}else if(previousBufferPtr == audioBuffer02){
+					currentBufferPtr = audioBuffer01;
+				}
+
+				//Load current buffer with new frequency sine wave
+				for (int i=0;i<AUDIO_BUFFER_SIZE;i++)
+				{
+					currentBufferPtr[i] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)i/(float)SAMPLE_FREQ*2*3.14));
+				}
+
+				//Sending the pointer for the next buffer to the audio manager
+				osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
+
+				previousBufferPtr = currentBufferPtr;
+
+				if(lastPlaybackSecond != audioSecondsRemaining){
+					sprintf(stringDump3, "%d s ... \n", (int)audioSecondsRemaining);
+					WriteConsole((uint8_t*)stringDump3);
+					lastPlaybackSecond = audioSecondsRemaining;
+				}
+
+				//Wait for the end of playback for the last buffer
+				osSemaphoreWait(audioOutputSemHandle, osWaitForever);
+
+			}
+
+			//Audio playback is done. We can now pass a null pointer to stop outputting audio.
+			osMessagePut(audioOutputQueueHandle, (int)NULL, 0);
+			osTimerStop(audioPlaybackTimerHandle);
 
 			return 1;
 		}else{

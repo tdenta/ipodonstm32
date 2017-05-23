@@ -56,6 +56,7 @@ osThreadId defaultTaskHandle;
 osThreadId myTask02Handle;
 osThreadId myTask03Handle;
 osThreadId myTaskCommandLineListenerHandle;
+osThreadId audioManagerTaskHandle;
 osMessageQId myQueue01Handle;
 osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
@@ -70,14 +71,19 @@ osMessageQId toneAmplitudeQueueHandle;
 osMutexId audioBufferMutexHandle;
 osMutexId serialOutputMutexHandle;
 osSemaphoreId serialOutputSemHandle;
+osTimerId audioPlaybackTimerHandle;
+osSemaphoreId audioOutputSemHandle;
+osMessageQId audioOutputQueueHandle;
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
 void StartDefaultTask(void const * argument);
+void StartAudioManagerTask(void const * argument);
 void StartTask02(void const * argument);
 void StartTask03(void const * argument);
 void StartCommandLineListener(void const *argument);
 void Callback01(void const * argument);
+void AudioPlaybackCallback(void const* argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -118,6 +124,9 @@ void MX_FREERTOS_Init(void) {
   osSemaphoreDef(serialOutputSem);
   serialOutputSemHandle = osSemaphoreCreate(osSemaphore(serialOutputSem), 1);
 
+  osSemaphoreDef(audioOutputSem);
+  audioOutputSemHandle = osSemaphoreCreate(osSemaphore(audioOutputSem), 1);
+
   /* definition and creation of myCountingSem01 */
   osSemaphoreDef(myCountingSem01);
   myCountingSem01Handle = osSemaphoreCreate(osSemaphore(myCountingSem01), 2);
@@ -135,6 +144,10 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
+
+  osTimerDef(audioPlaybackTimer, AudioPlaybackCallback);
+  audioPlaybackTimerHandle = osTimerCreate(osTimer(audioPlaybackTimer), osTimerPeriodic, NULL);
+
   // STEPIEN
   osTimerStart(myTimer01Handle, 50);
   /* USER CODE END RTOS_TIMERS */
@@ -156,6 +169,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(CommandLineListenerTask, StartCommandLineListener, osPriorityNormal, 0, 512);
   myTaskCommandLineListenerHandle = osThreadCreate(osThread(CommandLineListenerTask), NULL);
 
+  /* definition and creation of AudioManager task */
+   osThreadDef(AudioManagerTask, StartAudioManagerTask, osPriorityNormal, 0, 512);
+   audioManagerTaskHandle = osThreadCreate(osThread(AudioManagerTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -172,6 +189,9 @@ void MX_FREERTOS_Init(void) {
 
   osMessageQDef(toneFrequencyQueue, 16, uint16_t);
   toneFrequencyQueueHandle = osMessageCreate(osMessageQ(toneFrequencyQueue), NULL);
+
+  osMessageQDef(audioOutputQueue, 16, uint16_t*);
+  audioOutputQueueHandle = osMessageCreate(osMessageQ(audioOutputQueue), NULL);
 
   /* USER CODE END RTOS_QUEUES */
 }
@@ -215,6 +235,11 @@ void StartCommandLineListener(void const *argument){
 	CommandLineListener(argument);
 }
 
+void StartAudioManagerTask(void const * argument){
+	AudioManager(argument);
+}
+
+
 /* Callback01 function */
 void Callback01(void const * argument)
 {
@@ -224,6 +249,10 @@ void Callback01(void const * argument)
   osSignalSet(defaultTaskHandle, 1);
 
   /* USER CODE END Callback01 */
+}
+
+void AudioPlaybackCallback(void const* argument){
+	audioSecondsRemaining--;
 }
 
 /* USER CODE BEGIN Application */

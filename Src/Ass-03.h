@@ -32,6 +32,7 @@ extern osThreadId myTask02Handle;
 extern osThreadId myTask03Handle;
 extern osThreadId myTaskCommandLineListenerHandle;
 extern osTimerId myTimer01Handle;
+extern osThreadId audioManagerTaskHandle;
 
 extern osSemaphoreId myBinarySem01Handle;
 extern osMessageQId myQueue01Handle;
@@ -44,12 +45,18 @@ extern osMessageQId toneAmplitudeQueueHandle;
 extern osMessageQId toneFrequencyQueueHandle;
 extern osSemaphoreId serialOutputSemHandle;
 
+extern osTimerId audioPlaybackTimerHandle;
+extern osSemaphoreId audioOutputSemHandle;
+extern osMessageQId audioOutputQueueHandle;
+
+
 // Assignment tasks
 extern void Ass_03_Task_01(void const *argument);
 extern void Ass_03_Task_02(void const *argument);
 extern void Ass_03_Task_03(void const *argument);
 
 extern void CommandLineListener(void const * argument);
+extern void AudioManager(void const *argument);
 
 // Library functions
 extern void WriteConsole(uint8_t *s);
@@ -69,6 +76,8 @@ extern void ReadConsole(uint8_t *c);
 #define RESET "\x1B[0m"
 
 #define BUFFER_MAX_SIZE 100
+#define AUDIO_BUFFER_SIZE 512
+#define SAMPLE_FREQ 8000
 
 //User structures & global variables
 typedef struct{
@@ -95,6 +104,8 @@ extern int8_t IsFloatNumber(uint8_t* string);
 
 extern int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]);
 
+extern int8_t continueReadingFlag;
+extern int32_t audioSecondsRemaining;
 
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
