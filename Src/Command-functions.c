@@ -10,7 +10,6 @@
 //DebugLevel variable is used for the debug mode
 uint8_t DebugLevel = 0;
 char stringDump3[300] ={0};
-static FILINFO fno;
 
 /*
  * Function SubFunction
@@ -437,10 +436,21 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	static FILINFO fno;
+	FRESULT res;
 	DIR dir;
 	char* path;
 
-	f_opendir(&dir, path );
+	res = f_opendir(&dir, path );
+	if(res  == FR_OK){
+		for(;;){
+			res = f_readdir(&dir, &fno);
+			if(res !=  FR_OK || fno.fname[0] == 0) break;
+			if (fno.fattrib & AM_DIR){
+
+			}
+		}
+		f_closedir(&dir);
+	}
 
 	return 0;
 }
