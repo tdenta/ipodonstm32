@@ -57,13 +57,19 @@ osThreadId myTask02Handle;
 osThreadId myTask03Handle;
 osThreadId myTaskCommandLineListenerHandle;
 osMessageQId myQueue01Handle;
+osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
 osMutexId myMutex01Handle;
-osMutexId audioBufferMutexHandle;
+
 osSemaphoreId myBinarySem01Handle;
 osSemaphoreId myCountingSem01Handle;
 
 /* USER CODE BEGIN Variables */
+osMessageQId toneFrequencyQueueHandle;
+osMessageQId toneAmplitudeQueueHandle;
+osMutexId audioBufferMutexHandle;
+osMutexId serialOutputMutexHandle;
+osSemaphoreId serialOutputSemHandle;
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
@@ -99,12 +105,18 @@ void MX_FREERTOS_Init(void) {
   osMutexDef(audioBufferMutex);
   audioBufferMutexHandle = osMutexCreate(osMutex(audioBufferMutex));
 
+  osMutexDef(serialOutputMutex);
+  serialOutputMutexHandle = osMutexCreate(osMutex(serialOutputMutex));
+
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */
   /* definition and creation of myBinarySem01 */
   osSemaphoreDef(myBinarySem01);
   myBinarySem01Handle = osSemaphoreCreate(osSemaphore(myBinarySem01), 1);
+
+  osSemaphoreDef(serialOutputSem);
+  serialOutputSemHandle = osSemaphoreCreate(osSemaphore(serialOutputSem), 1);
 
   /* definition and creation of myCountingSem01 */
   osSemaphoreDef(myCountingSem01);
@@ -113,6 +125,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   osSemaphoreWait(myBinarySem01Handle, osWaitForever); // STEPIEN: Start with nothing
+  osSemaphoreWait(serialOutputSemHandle, osWaitForever);
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* Create the timer(s) */
@@ -153,7 +166,13 @@ void MX_FREERTOS_Init(void) {
   myQueue01Handle = osMessageCreate(osMessageQ(myQueue01), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+
+  osMessageQDef(toneAmplitudeQueue, 16, uint16_t);
+  toneAmplitudeQueueHandle = osMessageCreate(osMessageQ(toneAmplitudeQueue), NULL);
+
+  osMessageQDef(toneFrequencyQueue, 16, uint16_t);
+  toneFrequencyQueueHandle = osMessageCreate(osMessageQ(toneFrequencyQueue), NULL);
+
   /* USER CODE END RTOS_QUEUES */
 }
 
@@ -212,6 +231,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   // STEPIEN: Signal that data is available
   osSemaphoreRelease(myBinarySem01Handle);
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	  osSemaphoreRelease(serialOutputSemHandle);
 }
 /* USER CODE END Application */
 

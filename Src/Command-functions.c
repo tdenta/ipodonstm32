@@ -367,12 +367,12 @@ int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 }
 
 int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
-	if(ArgNum == 2){
+	if(ArgNum == 3){
 
 		if(DebugLevel){
 			sprintf(stringDump3, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
 			WriteConsole((uint8_t*)stringDump3);
-			osDelay(10);
+			//osDelay(10);
 		}
 
 		if(IsNumber(ArgStrings[0]) && IsNumber(ArgStrings[1])){
@@ -383,15 +383,32 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			}
 
 			int ToneFrequency = 0;
+			int ToneVolume = 50;
 			int ToneDuration = 0;
 			int percent = 0;
 
 			//Convert arguments into numbers
 			sscanf((char*)ArgStrings[0], "%d", (int*)&ToneFrequency);
-			sscanf((char*)ArgStrings[1], "%d", (int*)&ToneDuration);
+			sscanf((char*)ArgStrings[1], "%d", (int*)&ToneVolume);
+			sscanf((char*)ArgStrings[2], "%d", (int*)&ToneDuration);
+
+			//Convert ToneVolume from percents to 16 bit signed values, maximum is 32,767
+			ToneVolume = (int)(float)(((float)ToneVolume/100)*32767);
+
+			if(DebugLevel){
+				sprintf(stringDump3, "Acquired tone frequency: %dHz\n", ToneFrequency);
+				WriteConsole((uint8_t*)stringDump3);
+				sprintf(stringDump3, "Acquired numerical tone volume: %d over 32767\n", ToneVolume);
+				WriteConsole((uint8_t*)stringDump3);
+				sprintf(stringDump3, "Acquired tone duration: %d seconds\n", ToneDuration);
+				WriteConsole((uint8_t*)stringDump3);
+			}
 
 			//Send message to change tone frequency
-			osMessagePut (myQueue01Handle, ToneFrequency, 0);
+			osMessagePut (toneFrequencyQueueHandle, ToneFrequency, 0);
+
+			//Send message to change tone volume
+			osMessagePut (toneAmplitudeQueueHandle, ToneVolume, 0);
 
 			//Wait a number of seconds specified by ToneDuration and print every percent
 			while(percent++ < 100){

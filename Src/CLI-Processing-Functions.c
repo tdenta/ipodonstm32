@@ -15,7 +15,7 @@ const command_s CommandList[] = {
 		{(int8_t*) "div", &DivFunction, (int8_t*)"div <num1> <num2>"},
 		{(int8_t*) "mul", &MulFunction, (int8_t*)"mul <num1> <num2>"},
 		{(int8_t*) "list", &ListFunction, (int8_t*)"list _no-arguments_"},
-		{(int8_t*) "tone", &ToneFunction, (int8_t*) "tone <frequency[Hz]> <duration[s]>"},
+		{(int8_t*) "tone", &ToneFunction, (int8_t*) "tone <frequency[Hz]> <volume[%]> <duration[s]>"},
 		{NULL, NULL, NULL}
 };
 
