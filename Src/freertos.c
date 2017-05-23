@@ -161,9 +161,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(myTask02, StartTask02, osPriorityNormal, 0, 512);
   myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
 
-  /* definition and creation of myTask03 */
-/*  osThreadDef(myTask03, StartTask03, osPriorityNormal, 0, 512);
-  myTask03Handle = osThreadCreate(osThread(myTask03), NULL);*/
+ //definition and creation of myTask03
+ osThreadDef(myTask03, StartTask03, osPriorityNormal, 0, 512);
+  myTask03Handle = osThreadCreate(osThread(myTask03), NULL);
 
   /* definition and creation of CommandLineListener task */
   osThreadDef(CommandLineListenerTask, StartCommandLineListener, osPriorityNormal, 0, 512);
