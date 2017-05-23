@@ -438,6 +438,9 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				currentBufferPtr[i] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)i/(float)SAMPLE_FREQ*2*3.14));
 			}
 
+			//Waiting for DMA to be released by another thread
+			osMutexWait(DMAControllerMutexHandle, osWaitForever);
+
 			//Signalling that DMA should be activated
 			osSignalSet(audioManagerTaskHandle, 0x01);
 
@@ -491,6 +494,8 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			//Audio playback is done. We can now pass a null pointer to stop outputting audio.
 			osMessagePut(audioOutputQueueHandle, (int)NULL, 0);
 			osTimerStop(audioPlaybackTimerHandle);
+
+			osMutexRelease(DMAControllerMutexHandle);
 
 			return 1;
 		}else{

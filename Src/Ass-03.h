@@ -41,6 +41,7 @@ extern osMutexId myMutex01Handle;
 //User OS Handles
 extern osMutexId audioBufferMutexHandle;
 extern osMutexId serialOutputMutexHandle;
+extern osMutexId DMAControllerMutexHandle;
 extern osMessageQId toneAmplitudeQueueHandle;
 extern osMessageQId toneFrequencyQueueHandle;
 extern osSemaphoreId serialOutputSemHandle;

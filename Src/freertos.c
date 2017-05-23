@@ -70,6 +70,7 @@ osMessageQId toneFrequencyQueueHandle;
 osMessageQId toneAmplitudeQueueHandle;
 osMutexId audioBufferMutexHandle;
 osMutexId serialOutputMutexHandle;
+osMutexId DMAControllerMutexHandle;
 osSemaphoreId serialOutputSemHandle;
 osTimerId audioPlaybackTimerHandle;
 osSemaphoreId audioOutputSemHandle;
@@ -113,6 +114,9 @@ void MX_FREERTOS_Init(void) {
 
   osMutexDef(serialOutputMutex);
   serialOutputMutexHandle = osMutexCreate(osMutex(serialOutputMutex));
+
+  osMutexDef(DMAControllerMutex);
+  DMAControllerMutexHandle = osMutexCreate(osMutex(DMAControllerMutex));
 
   /* USER CODE END RTOS_MUTEX */
 
