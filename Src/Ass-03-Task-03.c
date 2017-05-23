@@ -48,15 +48,15 @@ void Ass_03_Task_03(void const * argument)
 
   while (1)
   {
-      ReadConsole(&c);
-      sprintf(s,"Task 3: %d (got '%c')",loop,c);
-      osMutexWait(myMutex01Handle, osWaitForever);
-      BSP_LCD_DisplayStringAt(5,220, s, LEFT_MODE);
-      osMutexRelease(myMutex01Handle);
-      HAL_GPIO_TogglePin(GPIOD, LD3_Pin); // Toggle LED3
-      loop++;
+//      ReadConsole(&c);
+//      sprintf(s,"Task 3: %d (got '%c')",loop,c);
+//      osMutexWait(myMutex01Handle, osWaitForever);
+//      BSP_LCD_DisplayStringAt(5,220, s, LEFT_MODE);
+//      osMutexRelease(myMutex01Handle);
+//      HAL_GPIO_TogglePin(GPIOD, LD3_Pin); // Toggle LED3
+//      loop++;
 
-      myReadFile();
+      //myReadFile();
   }
 }
 

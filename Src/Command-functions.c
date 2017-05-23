@@ -12,6 +12,7 @@ uint8_t DebugLevel = 0;
 
 //StringDump variable is used to output text to the serial port
 char stringDump3[300] ={0};
+DIR* dir;
 
 /*
  * Function SubFunction
@@ -506,25 +507,51 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
+int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+
+	static FILINFO FileInfoCdFunction;
+	FRESULT res;
+
+//	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &FileInfoCdFunction)) == FR_OK ){
+//
+//		f_chdir(SD_Path);
+//		WriteConsole((uint8_t*)path);
+//	}
+
+
+
+return 0;
+}
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	static FILINFO fno;
 	FRESULT res;
+	int error = 0;
 	DIR dir;
-	char* path;
 
-	res = f_opendir(&dir, path );
-	if(res  == FR_OK){
-		for(;;){
+	WriteConsole((uint8_t*)"Hello from LsFunction\n");
+
+	res = f_opendir(&dir, SD_Path ); //Open the current directory
+	error = res;
+	sprintf(stringDump3, GRN "%d arguments correctly detected.\n" RESET, error);
+	WriteConsole((uint8_t*)stringDump3);
+	if(res  == FR_OK){ //Error check
+		WriteConsole((uint8_t*)"Hello from LsFunction2");
+		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
 			res = f_readdir(&dir, &fno);
 			if(res !=  FR_OK || fno.fname[0] == 0) break;
-			if (fno.fattrib & AM_DIR){
+			if (fno.fattrib & AM_DIR){ //If it is a directory
+				WriteConsole((uint8_t*)SD_Path);
+				WriteConsole((uint8_t *)"\t(Folder)");
 
+			}else{
+				WriteConsole((uint8_t*)fno.fname);
+				WriteConsole((uint8_t *)"\t(File)");
 			}
 		}
 		f_closedir(&dir);
 	}
 
-	return 0;
+	return res;
 }
 
