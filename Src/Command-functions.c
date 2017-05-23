@@ -10,6 +10,7 @@
 //DebugLevel variable is used for the debug mode
 uint8_t DebugLevel = 0;
 char stringDump3[300] ={0};
+static FILINFO fno;
 
 /*
  * Function SubFunction
@@ -416,4 +417,14 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
+int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+
+	static FILINFO fno;
+	DIR dir;
+	char* path;
+
+	f_opendir(&dir, path );
+
+	return 0;
+}
 
