@@ -36,7 +36,13 @@ extern osTimerId myTimer01Handle;
 extern osSemaphoreId myBinarySem01Handle;
 extern osMessageQId myQueue01Handle;
 extern osMutexId myMutex01Handle;
+
+//User OS Handles
 extern osMutexId audioBufferMutexHandle;
+extern osMutexId serialOutputMutexHandle;
+extern osMessageQId toneAmplitudeQueueHandle;
+extern osMessageQId toneFrequencyQueueHandle;
+extern osSemaphoreId serialOutputSemHandle;
 
 // Assignment tasks
 extern void Ass_03_Task_01(void const *argument);
