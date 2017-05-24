@@ -6,9 +6,9 @@
  */
 
 #include "Ass-03.h"
-	FILINFO fno;
-	FRESULT res;
-	DIR dir;
+FILINFO fno;
+FRESULT res;
+DIR dir;
 
 //DebugLevel variable is used for the debug mode
 uint8_t DebugLevel = 0;
@@ -388,7 +388,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				WriteConsole((uint8_t*)stringDump3);
 			}
 
-			int ToneFrequency = 0;
+			float ToneFrequency = 0;
 			int ToneVolume = 50;
 			int ToneDuration = 0;
 			//int percent = 0;
@@ -401,9 +401,11 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			//Convert ToneVolume from percents to 16 bit signed values, maximum is 32,767
 			ToneVolume = (int)(float)(((float)ToneVolume/100)*32767);
+			//Convert ToneFrequency from Hertz to Radians per second
+			ToneFrequency = ToneFrequency*2*3.14;
 
 			if(DebugLevel){
-				sprintf(stringDump3, "Acquired tone frequency: %dHz\n", ToneFrequency);
+				sprintf(stringDump3, "Acquired tone frequency: %f rad/s\n", ToneFrequency);
 				WriteConsole((uint8_t*)stringDump3);
 				sprintf(stringDump3, "Acquired numerical tone volume: %d over 32767\n", ToneVolume);
 				WriteConsole((uint8_t*)stringDump3);
@@ -411,7 +413,13 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				WriteConsole((uint8_t*)stringDump3);
 			}
 
-			/*//Send message to change tone frequency
+			if(ToneFrequency >= 0 &&
+					ToneFrequency <= 4000 &&
+					ToneVolume >= 0 &&
+					ToneVolume <=100 &&
+					ToneDuration >= 0){
+
+				/*//Send message to change tone frequency
 			osMessagePut (toneFrequencyQueueHandle, ToneFrequency, 0);
 
 			//Send message to change tone volume
@@ -430,78 +438,84 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			//Send message to put zero volume
 			osMessagePut (toneAmplitudeQueueHandle, 0, 0);*/
 
-			int16_t audioBuffer01[AUDIO_BUFFER_SIZE] = {0};
-			int16_t audioBuffer02[AUDIO_BUFFER_SIZE] = {0};
+				int16_t audioBuffer01[AUDIO_BUFFER_SIZE] = {0};
+				int16_t audioBuffer02[AUDIO_BUFFER_SIZE] = {0};
 
-			int16_t* previousBufferPtr = audioBuffer01;
-			int16_t* currentBufferPtr = audioBuffer01;
+				int16_t* previousBufferPtr = audioBuffer01;
+				int16_t* currentBufferPtr = audioBuffer01;
 
-			//Load initial buffer with new frequency sine wave
-			for (int i=0;i<AUDIO_BUFFER_SIZE;i++)
-			{
-				currentBufferPtr[i] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)i/(float)SAMPLE_FREQ*2*3.14));
-			}
-
-			//Waiting for DMA to be released by another thread
-			osMutexWait(DMAControllerMutexHandle, osWaitForever);
-
-			//Signalling that DMA should be activated
-			osSignalSet(audioManagerTaskHandle, 0x01);
-
-			//Immediate signal clear to avoid trying to restart the DMA again
-			//Not needed as we wait for any signal to be set
-			//osSignalClear(audioManagerTaskHandle, 0x01);
-
-			//Initializing the audio duration for timer
-			audioSecondsRemaining = ToneDuration;
-			lastPlaybackSecond = audioSecondsRemaining;
-
-			 sprintf(stringDump3, "%d s ... \n", lastPlaybackSecond);
-			 WriteConsole((uint8_t*)stringDump3);
-
-			//Sending the pointer for the initial buffer to the audio manager
-			osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
-
-			//Starting playback timer
-			osTimerStart(audioPlaybackTimerHandle, 1000);
-
-			//The main idea is that the next buffer to play should always be available BEFORE the DMA fires the callback telling it's done with current data
-			while(audioSecondsRemaining>0){
-				if(previousBufferPtr == audioBuffer01){
-					currentBufferPtr = audioBuffer02;
-				}else if(previousBufferPtr == audioBuffer02){
-					currentBufferPtr = audioBuffer01;
-				}
-
-				//Load current buffer with new frequency sine wave
+				//Load initial buffer with new frequency sine wave
 				for (int i=0;i<AUDIO_BUFFER_SIZE;i++)
 				{
 					currentBufferPtr[i] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)i/(float)SAMPLE_FREQ*2*3.14));
 				}
 
-				//Sending the pointer for the next buffer to the audio manager
+				//Waiting for DMA to be released by another thread
+				osMutexWait(DMAControllerMutexHandle, osWaitForever);
+
+				//Signalling that DMA should be activated
+				osSignalSet(audioManagerTaskHandle, 0x01);
+
+				//Immediate signal clear to avoid trying to restart the DMA again
+				//Not needed as we wait for any signal to be set
+				//osSignalClear(audioManagerTaskHandle, 0x01);
+
+				//Initializing the audio duration for timer
+				audioSecondsRemaining = ToneDuration;
+				lastPlaybackSecond = audioSecondsRemaining;
+
+				sprintf(stringDump3, "%d s ... \n", lastPlaybackSecond);
+				WriteConsole((uint8_t*)stringDump3);
+
+				//Sending the pointer for the initial buffer to the audio manager
 				osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
 
-				previousBufferPtr = currentBufferPtr;
+				//Starting playback timer
+				osTimerStart(audioPlaybackTimerHandle, 1000);
 
-				if(lastPlaybackSecond != audioSecondsRemaining){
-					sprintf(stringDump3, "%d s ... \n", (int)audioSecondsRemaining);
-					WriteConsole((uint8_t*)stringDump3);
-					lastPlaybackSecond = audioSecondsRemaining;
+				//The main idea is that the next buffer to play should always be available BEFORE the DMA fires the callback telling it's done with current data
+				while(audioSecondsRemaining>0){
+					if(previousBufferPtr == audioBuffer01){
+						currentBufferPtr = audioBuffer02;
+					}else if(previousBufferPtr == audioBuffer02){
+						currentBufferPtr = audioBuffer01;
+					}
+
+					//Load current buffer with new frequency sine wave
+					for (int i=0;i<AUDIO_BUFFER_SIZE;i++)
+					{
+						currentBufferPtr[i] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)i/(float)SAMPLE_FREQ*2*3.14));
+					}
+
+					//Sending the pointer for the next buffer to the audio manager
+					osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
+
+					previousBufferPtr = currentBufferPtr;
+
+					if(lastPlaybackSecond != audioSecondsRemaining){
+						sprintf(stringDump3, "%d s ... \n", (int)audioSecondsRemaining);
+						WriteConsole((uint8_t*)stringDump3);
+						lastPlaybackSecond = audioSecondsRemaining;
+					}
+
+					//Wait for the end of playback for the last buffer
+					osSemaphoreWait(audioOutputSemHandle, osWaitForever);
+
 				}
 
-				//Wait for the end of playback for the last buffer
-				osSemaphoreWait(audioOutputSemHandle, osWaitForever);
+				//Audio playback is done. We can now pass a null pointer to stop outputting audio.
+				osMessagePut(audioOutputQueueHandle, (int)NULL, 0);
+				osTimerStop(audioPlaybackTimerHandle);
 
+				osMutexRelease(DMAControllerMutexHandle);
+
+				return 1;
+
+			}else{
+				sprintf(stringDump3, RED "One of the arguments is out of bounds.\n0 <= Frequency <= 4000\n0 <= Volume <= 100\n0 <= Duration\n" RESET);
+				WriteConsole((uint8_t*)stringDump3);
+				return 0;
 			}
-
-			//Audio playback is done. We can now pass a null pointer to stop outputting audio.
-			osMessagePut(audioOutputQueueHandle, (int)NULL, 0);
-			osTimerStop(audioPlaybackTimerHandle);
-
-			osMutexRelease(DMAControllerMutexHandle);
-
-			return 1;
 		}else{
 			sprintf(stringDump3, RED "Arguments are not numbers.\n" RESET);
 			WriteConsole((uint8_t*)stringDump3);
@@ -520,15 +534,15 @@ int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	FRESULT res;
 
-//	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
-//
-//		f_chdir(SD_Path);
-//		WriteConsole((uint8_t*)path);
-//	}
+	//	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
+	//
+	//		f_chdir(SD_Path);
+	//		WriteConsole((uint8_t*)path);
+	//	}
 
 
 
-return 0;
+	return 0;
 }
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
@@ -555,14 +569,14 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			}else{
 				WriteConsole((uint8_t*)fno.lfname);
 			}
-//			if (fno.fattrib & AM_DIR){ //If it is a directory
-//				WriteConsole((uint8_t*)SD_Path);
-//				WriteConsole((uint8_t *)"\t(Folder)");
-//
-//			}else{
-//				WriteConsole((uint8_t*)fno.fname);
-//				WriteConsole((uint8_t *)"\t(File)");
-//			}
+			//			if (fno.fattrib & AM_DIR){ //If it is a directory
+			//				WriteConsole((uint8_t*)SD_Path);
+			//				WriteConsole((uint8_t *)"\t(Folder)");
+			//
+			//			}else{
+			//				WriteConsole((uint8_t*)fno.fname);
+			//				WriteConsole((uint8_t *)"\t(File)");
+			//			}
 		}
 		f_closedir(&dir);
 	}
