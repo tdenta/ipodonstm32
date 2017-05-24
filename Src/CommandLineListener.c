@@ -8,7 +8,7 @@
 // REPLACE THE EXAMPLE CODE WITH YOUR CODE
 //
 
-char stringDump[300] = {0};
+uint8_t stringDump[300] = {0};
 
 void CommandLineListener(void const * argument)
 {

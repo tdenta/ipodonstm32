@@ -27,8 +27,6 @@ int8_t buffer[BUFFER_MAX_SIZE];
 //Cursor intended to keep track of the insertion point for new characters coming
 int8_t BufferCursor = 0;
 
-char stringDump2[300] ={0};
-
 void CommandLineParserInit(void)
 {
 	// Print welcome message
@@ -60,8 +58,8 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 
 		if(Command_p == NULL){
 
-			sprintf(stringDump2, RED"Command \"%s\" not found.\n" RESET, ArgsArray[0]);
-			WriteConsole((uint8_t*)stringDump2);
+			sprintf(stringDump, RED"Command \"%s\" not found.\n" RESET, ArgsArray[0]);
+			WriteConsole((uint8_t*)stringDump);
 
 			ReturnCode = -1;
 		}else{
@@ -75,8 +73,8 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 			if(CommandResult == 0){
 
 				//PRINT TO CONSOLE
-				sprintf(stringDump2,  RED"An error has occurred executing the command.\n"RESET );
-				WriteConsole((uint8_t*)stringDump2);
+				sprintf(stringDump,  RED"An error has occurred executing the command.\n"RESET );
+				WriteConsole((uint8_t*)stringDump);
 				//END PRINT TO CONSOLE
 
 				ReturnCode = -2;
@@ -84,8 +82,8 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 		}
 
 	}else{
-		sprintf(stringDump2, YEL "Please type something.\n"RESET );
-		WriteConsole((uint8_t*)stringDump2);
+		sprintf(stringDump, YEL "Please type something.\n"RESET );
+		WriteConsole((uint8_t*)stringDump);
 		ReturnCode = -3;
 	}
 	return ReturnCode;

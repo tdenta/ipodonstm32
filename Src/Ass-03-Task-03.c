@@ -13,8 +13,6 @@ uint8_t myReadFile();
 FATFS SDFatFs;
 FIL MyFile;
 HAL_SD_ErrorTypedef Status;
-
-char stringDump4[300] ={0};
 DIR dir;
 
 void Ass_03_Task_03(void const * argument)
@@ -29,8 +27,8 @@ void Ass_03_Task_03(void const * argument)
   WriteConsole((uint8_t *)"Hello from Task 3 (press any key)\n");
 
   // Check if SD card driver available
-  sprintf(stringDump4, RED "retSD status: %d\n" RESET, retSD);
-  WriteConsole((uint8_t*)stringDump4);
+  //sprintf(stringDump4, RED "retSD status: %d\n" RESET, retSD);
+  //WriteConsole((uint8_t*)stringDump4);
   if(retSD != 0)
   {
     WriteConsole((uint8_t *)"ERROR: SD card driver not available.");
@@ -52,10 +50,6 @@ void Ass_03_Task_03(void const * argument)
 
   }
     myReadFile();
-    if ((res = f_opendir(&dir, "0:/" )) != FR_OK){                                   //Open the current directory
-
-    		WriteConsole((uint8_t*)"ERROR: Opening Directory");
-    	}
 
   while (1)
   {
@@ -65,8 +59,8 @@ void Ass_03_Task_03(void const * argument)
 //      osMutexWait(myMutex01Handle, osWaitForever);
 //      BSP_LCD_DisplayStringAt(5,220, s, LEFT_MODE);
 //      osMutexRelease(myMutex01Handle);
-//      HAL_GPIO_TogglePin(GPIOD, LD3_Pin); // Toggle LED3
-//      loop++;
+      HAL_GPIO_TogglePin(GPIOD, LD3_Pin); // Toggle LED3
+      loop++;
 
 
   }
@@ -76,8 +70,8 @@ uint8_t myReadFile()
 {
   FRESULT res;
   uint32_t bytesread;
-#define BUFF_SIZE 256
-  uint8_t rtext[BUFF_SIZE];
+#define BUFF_SIZE_2 256
+  uint8_t rtext[BUFF_SIZE_2];
 
   // Open file Hello.txt
   if((res = f_open(&MyFile, "Hello.txt", FA_READ)) != FR_OK)
@@ -88,7 +82,7 @@ uint8_t myReadFile()
   WriteConsole((uint8_t *)"Opened file 'Hello.txt'\n");
 
   // Read data from file
-  if ((res = f_read(&MyFile, rtext, BUFF_SIZE-1, &bytesread)) != FR_OK)
+  if ((res = f_read(&MyFile, rtext, BUFF_SIZE_2-1, &bytesread)) != FR_OK)
   {
     WriteConsole((uint8_t *)"ERROR: Reading 'Hello.txt'\n");
     f_close(&MyFile);

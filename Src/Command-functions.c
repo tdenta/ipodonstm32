@@ -13,9 +13,9 @@ DIR dir;
 //DebugLevel variable is used for the debug mode
 uint8_t DebugLevel = 0;
 
-//StringDump variable is used to output text to the serial port
-char stringDump3[300] ={0};
-
+//Audio buffers for ToneFunction
+int16_t audioBuffer01[AUDIO_BUFFER_SIZE] = {0};
+int16_t audioBuffer02[AUDIO_BUFFER_SIZE] = {0};
 
 /*
  * Function SubFunction
@@ -52,8 +52,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			*out = result;
 
 			//PRINT TO CONSOLE
-			sprintf(stringDump3, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
+			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
 			//Success return code
@@ -74,8 +74,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			*out = result;
 
 			//PRINT TO CONSOLE
-			sprintf(stringDump3, "%f - %f = %f \n", digit1, digit2, result);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, "%f - %f = %f \n", digit1, digit2, result);
+			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
 			//Success return code
@@ -83,8 +83,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		}else{
 
 			//PRINT TO CONSOLE
-			sprintf(stringDump3, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
+			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
 			//Error return code
@@ -93,8 +93,8 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}else{
 
 		//PRINT TO CONSOLE
-		sprintf(stringDump3, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
-		WriteConsole((uint8_t*)stringDump3);
+		sprintf(stringDump, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
 		//END PRINT TO CONSOLE
 
 		//Error return code
@@ -123,8 +123,8 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			DebugLevel = 1;
 			//PRINT TO CONSOLE
-			sprintf(stringDump3, GRN "Debug ON\n" RESET);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, GRN "Debug ON\n" RESET);
+			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
 			//Success return code
@@ -136,24 +136,24 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			DebugLevel = 0;
 			//PRINT TO CONSOLE
-			sprintf(stringDump3, YEL "Debug OFF\n" RESET);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, YEL "Debug OFF\n" RESET);
+			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
 			//Success return code
 			return 1;
 		}else{
 			//PRINT TO CONSOLE
-			sprintf(stringDump3, RED "Argument not recognized.\nUsage: help debug\n" RESET);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, RED "Argument not recognized.\nUsage: help debug\n" RESET);
+			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 			//Error return code
 			return 0;
 		}
 	}else{
 		//PRINT TO CONSOLE
-		sprintf(stringDump3, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
-		WriteConsole((uint8_t*)stringDump3);
+		sprintf(stringDump, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
 		//END PRINT TO CONSOLE
 		//Error return code
 		return 0;
@@ -173,28 +173,28 @@ int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 		//Debug messages display depends on DebugLevel variable
 		if(DebugLevel){
-			sprintf(stringDump3, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump);
 		}
 
 		//Search for the command being asked for help
 		const command_s* Command_p = GetCommandByName((int8_t*)ArgStrings[0]);
 
 		if(Command_p == NULL){
-			sprintf(stringDump3, RED "Command \"%s\" not found.\n" RESET, ArgStrings[0]);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, RED "Command \"%s\" not found.\n" RESET, ArgStrings[0]);
+			WriteConsole((uint8_t*)stringDump);
 			return 0;
 		}else{
 
 			//Print the actual function's help message
-			sprintf(stringDump3, CYN "Usage: %s \n" RESET, (char*)Command_p->HelpString);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, CYN "Usage: %s \n" RESET, (char*)Command_p->HelpString);
+			WriteConsole((uint8_t*)stringDump);
 			return 1;
 		}
 
 	}else{
-		sprintf(stringDump3, RED "The number of arguments is not correct. Usage: help help" RESET);
-		WriteConsole((uint8_t*)stringDump3);
+		sprintf(stringDump, RED "The number of arguments is not correct. Usage: help help" RESET);
+		WriteConsole((uint8_t*)stringDump);
 		//Error return code
 		return 0;
 	}
@@ -376,16 +376,16 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	if(ArgNum == 3){
 
 		if(DebugLevel){
-			sprintf(stringDump3, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump);
 			//osDelay(10);
 		}
 
 		if(IsNumber(ArgStrings[0]) && IsNumber(ArgStrings[1])){
 
 			if(DebugLevel){
-				sprintf(stringDump3, GRN "Arguments are numbers.\n" RESET);
-				WriteConsole((uint8_t*)stringDump3);
+				sprintf(stringDump, GRN "Arguments are numbers.\n" RESET);
+				WriteConsole((uint8_t*)stringDump);
 			}
 
 			float ToneFrequency = 0;
@@ -395,23 +395,9 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			int lastPlaybackSecond;
 
 			//Convert arguments into numbers
-			sscanf((char*)ArgStrings[0], "%d", (int*)&ToneFrequency);
+			sscanf((char*)ArgStrings[0], "%f", (float*)&ToneFrequency);
 			sscanf((char*)ArgStrings[1], "%d", (int*)&ToneVolume);
 			sscanf((char*)ArgStrings[2], "%d", (int*)&ToneDuration);
-
-			//Convert ToneVolume from percents to 16 bit signed values, maximum is 32,767
-			ToneVolume = (int)(float)(((float)ToneVolume/100)*32767);
-			//Convert ToneFrequency from Hertz to Radians per second
-			ToneFrequency = ToneFrequency*2*3.14;
-
-			if(DebugLevel){
-				sprintf(stringDump3, "Acquired tone frequency: %f rad/s\n", ToneFrequency);
-				WriteConsole((uint8_t*)stringDump3);
-				sprintf(stringDump3, "Acquired numerical tone volume: %d over 32767\n", ToneVolume);
-				WriteConsole((uint8_t*)stringDump3);
-				sprintf(stringDump3, "Acquired tone duration: %d seconds\n", ToneDuration);
-				WriteConsole((uint8_t*)stringDump3);
-			}
 
 			if(ToneFrequency >= 0 &&
 					ToneFrequency <= 4000 &&
@@ -438,16 +424,28 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			//Send message to put zero volume
 			osMessagePut (toneAmplitudeQueueHandle, 0, 0);*/
 
-				int16_t audioBuffer01[AUDIO_BUFFER_SIZE] = {0};
-				int16_t audioBuffer02[AUDIO_BUFFER_SIZE] = {0};
+				//Convert ToneVolume from percents to 16 bit signed values, maximum is 32,767
+				ToneVolume = (int)(float)(((float)ToneVolume/100)*32767);
+				//Convert ToneFrequency from Hertz to Radians per second
+				ToneFrequency = ToneFrequency*2*3.14;
 
+				if(DebugLevel){
+					sprintf(stringDump, "Acquired tone frequency: %f rad/s\n", ToneFrequency);
+					WriteConsole((uint8_t*)stringDump);
+					sprintf(stringDump, "Acquired numerical tone volume: %d over 32767\n", ToneVolume);
+					WriteConsole((uint8_t*)stringDump);
+					sprintf(stringDump, "Acquired tone duration: %d seconds\n", ToneDuration);
+					WriteConsole((uint8_t*)stringDump);
+				}
+
+				//Audio buffers declared as global
 				int16_t* previousBufferPtr = audioBuffer01;
 				int16_t* currentBufferPtr = audioBuffer01;
 
 				//Load initial buffer with new frequency sine wave
-				for (int i=0;i<AUDIO_BUFFER_SIZE;i++)
+				for (int blah=0;blah<AUDIO_BUFFER_SIZE;blah++)
 				{
-					currentBufferPtr[i] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)i/(float)SAMPLE_FREQ*2*3.14));
+					currentBufferPtr[blah] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)blah/(float)SAMPLE_FREQ*2*3.14));
 				}
 
 				//Waiting for DMA to be released by another thread
@@ -464,8 +462,8 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				audioSecondsRemaining = ToneDuration;
 				lastPlaybackSecond = audioSecondsRemaining;
 
-				sprintf(stringDump3, "%d s ... \n", lastPlaybackSecond);
-				WriteConsole((uint8_t*)stringDump3);
+				sprintf(stringDump, "%d s ... \n", lastPlaybackSecond);
+				WriteConsole((uint8_t*)stringDump);
 
 				//Sending the pointer for the initial buffer to the audio manager
 				osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
@@ -492,9 +490,12 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 					previousBufferPtr = currentBufferPtr;
 
+					sprintf(stringDump, "%d s ... \n", (int)audioSecondsRemaining);
+					WriteConsole((uint8_t*)stringDump);
+
 					if(lastPlaybackSecond != audioSecondsRemaining){
-						sprintf(stringDump3, "%d s ... \n", (int)audioSecondsRemaining);
-						WriteConsole((uint8_t*)stringDump3);
+						sprintf(stringDump, "%d s ... \n", (int)audioSecondsRemaining);
+						WriteConsole((uint8_t*)stringDump);
 						lastPlaybackSecond = audioSecondsRemaining;
 					}
 
@@ -512,19 +513,19 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				return 1;
 
 			}else{
-				sprintf(stringDump3, RED "One of the arguments is out of bounds.\n0 <= Frequency <= 4000\n0 <= Volume <= 100\n0 <= Duration\n" RESET);
-				WriteConsole((uint8_t*)stringDump3);
+				sprintf(stringDump, RED "One of the arguments is out of bounds.\n0 <= Frequency <= 4000\n0 <= Volume <= 100\n0 <= Duration\n" RESET);
+				WriteConsole((uint8_t*)stringDump);
 				return 0;
 			}
 		}else{
-			sprintf(stringDump3, RED "Arguments are not numbers.\n" RESET);
-			WriteConsole((uint8_t*)stringDump3);
+			sprintf(stringDump, RED "Arguments are not numbers.\n" RESET);
+			WriteConsole((uint8_t*)stringDump);
 			return 0;
 		}
 
 	}else{
-		sprintf(stringDump3, RED "The number of arguments is not correct. Usage: help tone.\n" RESET);
-		WriteConsole((uint8_t*)stringDump3);
+		sprintf(stringDump, RED "The number of arguments is not correct. Usage: help tone.\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
 		return 0;
 	}
 }
@@ -555,8 +556,8 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		WriteConsole((uint8_t*)"ERROR: Opening Directory");
 	}
 	//res = f_opendir(&dir, //SD_Path ); //Open the current directory
-	sprintf(stringDump3, RED "\nError # %d\n" RESET, error);
-	WriteConsole((uint8_t*)stringDump3);
+	sprintf(stringDump, RED "\nError # %d\n" RESET, error);
+	WriteConsole((uint8_t*)stringDump);
 	if(res  == FR_OK){ //Error check
 		WriteConsole((uint8_t*)"Hello from LsFunction2");
 		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
