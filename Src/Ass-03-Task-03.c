@@ -14,6 +14,9 @@ FATFS SDFatFs;
 FIL MyFile;
 HAL_SD_ErrorTypedef Status;
 
+char stringDump4[300] ={0};
+DIR dir;
+
 void Ass_03_Task_03(void const * argument)
 {
   FRESULT res;
@@ -26,6 +29,8 @@ void Ass_03_Task_03(void const * argument)
   WriteConsole((uint8_t *)"Hello from Task 3 (press any key)\n");
 
   // Check if SD card driver available
+  sprintf(stringDump4, RED "retSD status: %d\n" RESET, retSD);
+  WriteConsole((uint8_t*)stringDump4);
   if(retSD != 0)
   {
     WriteConsole((uint8_t *)"ERROR: SD card driver not available.");
@@ -34,21 +39,28 @@ void Ass_03_Task_03(void const * argument)
   else
   {
     WriteConsole((uint8_t *)"SD card driver available.\n");
-
+  }
     // Mount file system
     if((res = f_mount(&SDFatFs, (TCHAR const *)SD_Path, 0)) != FR_OK)
     {
       WriteConsole((uint8_t *)"ERROR: Could not mount file system.\n");
       ReadFlag = 0;
-    }
+    }else{
     WriteConsole((uint8_t *)"Mounted file system: ");
     WriteConsole((uint8_t *)SD_Path);
     WriteConsole((uint8_t *)"\n");
+
   }
+    myReadFile();
+    if ((res = f_opendir(&dir, "0:/" )) != FR_OK){                                   //Open the current directory
+
+    		WriteConsole((uint8_t*)"ERROR: Opening Directory");
+    	}
 
   while (1)
   {
 //      ReadConsole(&c);
+//      WriteConsole((uint8_t*)"Task 3 loop\n");
 //      sprintf(s,"Task 3: %d (got '%c')",loop,c);
 //      osMutexWait(myMutex01Handle, osWaitForever);
 //      BSP_LCD_DisplayStringAt(5,220, s, LEFT_MODE);
@@ -56,7 +68,7 @@ void Ass_03_Task_03(void const * argument)
 //      HAL_GPIO_TogglePin(GPIOD, LD3_Pin); // Toggle LED3
 //      loop++;
 
-      //myReadFile();
+
   }
 }
 
