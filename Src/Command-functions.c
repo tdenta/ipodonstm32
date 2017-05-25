@@ -399,6 +399,15 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			sscanf((char*)ArgStrings[1], "%d", (int*)&ToneVolume);
 			sscanf((char*)ArgStrings[2], "%d", (int*)&ToneDuration);
 
+			if(DebugLevel){
+				sprintf(stringDump, "Typed tone frequency: %f Hz\n", ToneFrequency);
+				WriteConsole((uint8_t*)stringDump);
+				sprintf(stringDump, "Typed tone volume: %d%%\n", ToneVolume);
+				WriteConsole((uint8_t*)stringDump);
+				sprintf(stringDump, "Typed tone duration: %d seconds\n", ToneDuration);
+				WriteConsole((uint8_t*)stringDump);
+			}
+
 			if(ToneFrequency >= 0 &&
 					ToneFrequency <= 4000 &&
 					ToneVolume >= 0 &&
@@ -427,10 +436,10 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				//Convert ToneVolume from percents to 16 bit signed values, maximum is 32,767
 				ToneVolume = (int)(float)(((float)ToneVolume/100)*32767);
 				//Convert ToneFrequency from Hertz to Radians per second
-				ToneFrequency = ToneFrequency*2*3.14;
+				ToneFrequency = (float)ToneFrequency *2*3.14;
 
 				if(DebugLevel){
-					sprintf(stringDump, "Acquired tone frequency: %f rad/s\n", ToneFrequency);
+					sprintf(stringDump, "Acquired tone frequency: %f rad/s\n", (float)ToneFrequency);
 					WriteConsole((uint8_t*)stringDump);
 					sprintf(stringDump, "Acquired numerical tone volume: %d over 32767\n", ToneVolume);
 					WriteConsole((uint8_t*)stringDump);
@@ -445,7 +454,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				//Load initial buffer with new frequency sine wave
 				for (int blah=0;blah<AUDIO_BUFFER_SIZE;blah++)
 				{
-					currentBufferPtr[blah] = (int16_t)(ToneVolume*sin((ToneFrequency)*(float)blah/(float)SAMPLE_FREQ*2*3.14));
+					currentBufferPtr[blah] = (int16_t)(ToneVolume*sin(((float)ToneFrequency)*(float)blah/(float)SAMPLE_FREQ*2*3.14));
 				}
 
 				//Waiting for DMA to be released by another thread
@@ -489,9 +498,6 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 					osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
 
 					previousBufferPtr = currentBufferPtr;
-
-					sprintf(stringDump, "%d s ... \n", (int)audioSecondsRemaining);
-					WriteConsole((uint8_t*)stringDump);
 
 					if(lastPlaybackSecond != audioSecondsRemaining){
 						sprintf(stringDump, "%d s ... \n", (int)audioSecondsRemaining);
