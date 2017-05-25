@@ -540,35 +540,69 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
-	char directoryBuffer[PATH_BUFFER_SIZE];
 
 	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
+		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
+			//uint8_t* pwdCopy[PATH_BUFFER_SIZE + 100] = {0};
+			//strcpy(pwdCopy, pathOfCurrentWorkingDirectory);
+		TCHAR buff[100];
+		char c = '/';
+			//Concatenate the pwd and the name of the new directory
+			//strcat(pwdCopy, ArgStrings[0]);
 
+		if ((res = f_opendir(&dir, pathOfCurrentWorkingDirectory )) != FR_OK){                                   //Open the current directory
+
+				WriteConsole((uint8_t*)"ERROR: Opening Directory");
+			}
+
+			//Creating a constant to meet fatfs functions requirements
+			const TCHAR* pathOfNewDirectory = ArgStrings[0];
+
+<<<<<<< HEAD
+			if ((res = f_chdir(pathOfNewDirectory)) != FR_OK){                                   //Open the current directory
+=======
 			//strcpy(directoryBuffer, );
 			if ((res = f_opendir(&dir, SD_Path )) != FR_OK){                                   //Open the current directory
+>>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 
 				WriteConsole((uint8_t*)"ERROR: Opening Directory");
 				return 0;
 			}
 
+<<<<<<< HEAD
+			f_getcwd(buff, (UINT)100);
+			//WriteConsole((uint8_t*)buff);
+			strcpy((char*)pathOfCurrentWorkingDirectory, (char*)buff);
+			WriteConsole((uint8_t*)pathOfCurrentWorkingDirectory);
+			f_closedir(&dir);
+
+=======
+>>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 	}
 	return 1;
 }
 
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
-	int error = 0;
 	static TCHAR LongFileName[_MAX_LFN];
 	static int FolderCount = 0;
 	static int FileCount = 0;
+	TCHAR buff[100];
 
-
-	if ((res = f_opendir(&dir, SD_Path )) != FR_OK){                                   //Open the current directory
+	if ((res = f_opendir(&dir, "" )) != FR_OK){                                   //Open the current directory
 
 		WriteConsole((uint8_t*)"ERROR: Opening Directory");
 	}
+
+	f_getcwd(buff, (UINT)100);
+	sprintf(stringDump,MAG"%s\n"RESET, buff);
+	WriteConsole((uint8_t*)stringDump);
 	//res = f_opendir(&dir, //SD_Path ); //Open the current directory
+<<<<<<< HEAD
+	sprintf(stringDump,"%s\n", pathOfCurrentWorkingDirectory);
+=======
 	sprintf((char*)stringDump,"%s\n", SD_Path);
+>>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 	WriteConsole((uint8_t*)stringDump);
 
 		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
@@ -578,7 +612,13 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			res = f_readdir(&dir, &fno);
 
+<<<<<<< HEAD
+			sprintf(stringDump,RED"%c\n"RESET, fno.fname[0]);
+			WriteConsole((uint8_t*)stringDump);
+			if(res !=  FR_OK ||  fno.lfname[0] == 0) break;
+=======
 			if(res !=  FR_OK || fno.fname[0] == 0) break;
+>>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 
 			if(fno.fname[0] == 0 ){
 				WriteConsole((uint8_t*)fno.fname);
@@ -596,12 +636,17 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				FileCount++;
 			}
 		}
+<<<<<<< HEAD
+		sprintf(stringDump,RED"%c\n"RESET, fno.fname[0]);
+		WriteConsole((uint8_t*)stringDump);
+		sprintf(stringDump, YEL "Folders: %d\nFiles: %d" RESET, FolderCount, FileCount);
+=======
 		sprintf((char*)stringDump, YEL "Folders: %d\nFiles: %d" RESET, FolderCount, FileCount);
+>>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 		WriteConsole((uint8_t *)stringDump);
 		f_closedir(&dir);
 		FolderCount = 0;
 		FileCount = 0;
-
 	return 1;
 }
 
@@ -666,7 +711,11 @@ int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 		//Warning!!!!!!!!!-This function relies on relative paths
 
+<<<<<<< HEAD
+		//switch res
+=======
 		res = f_unlink((TCHAR*)ArgStrings[0]);
+>>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 
 		if(res != FR_OK){
 			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
@@ -683,6 +732,8 @@ int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		WriteConsole((uint8_t*)stringDump);
 		return 0;
 	}
+	return 1;
+
 }
 
 /*

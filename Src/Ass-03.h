@@ -114,9 +114,13 @@ extern int32_t audioSecondsRemaining;
 extern uint8_t stringDump[300];
 extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
-extern FATFS SDFatFs;
 extern uint8_t pathOfCurrentWorkingDirectory[300];
+<<<<<<< HEAD
+extern FATFS SDFatFs;
+
+=======
 extern const uint8_t* fsErrors[];
+>>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 
 //Variables used in the copy function
 extern FIL fsrc, fdst;      /* File objects */
