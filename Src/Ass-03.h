@@ -115,6 +115,7 @@ extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
 extern FATFS SDFatFs;
 extern uint8_t pathOfCurrentWorkingDirectory[300];
+extern const uint8_t* fsErrors[];
 
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
@@ -127,5 +128,6 @@ extern int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
+extern int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 
 #endif /* ASS_03_H_ */

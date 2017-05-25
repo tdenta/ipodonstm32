@@ -52,7 +52,7 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			*out = result;
 
 			//PRINT TO CONSOLE
-			sprintf(stringDump, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
+			sprintf((char*)stringDump, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
 			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
@@ -74,7 +74,7 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			*out = result;
 
 			//PRINT TO CONSOLE
-			sprintf(stringDump, "%f - %f = %f \n", digit1, digit2, result);
+			sprintf((char*)stringDump, "%f - %f = %f \n", digit1, digit2, result);
 			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
@@ -83,7 +83,7 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		}else{
 
 			//PRINT TO CONSOLE
-			sprintf(stringDump, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
+			sprintf((char*)stringDump, RED "Arguments are not numbers.\nUsage: help sub\n" RESET);
 			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
@@ -93,7 +93,7 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}else{
 
 		//PRINT TO CONSOLE
-		sprintf(stringDump, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
+		sprintf((char*)stringDump, RED "The number of arguments is not correct.\nUsage: help sub\n" RESET);
 		WriteConsole((uint8_t*)stringDump);
 		//END PRINT TO CONSOLE
 
@@ -123,7 +123,7 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			DebugLevel = 1;
 			//PRINT TO CONSOLE
-			sprintf(stringDump, GRN "Debug ON\n" RESET);
+			sprintf((char*)stringDump, GRN "Debug ON\n" RESET);
 			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
@@ -136,7 +136,7 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			DebugLevel = 0;
 			//PRINT TO CONSOLE
-			sprintf(stringDump, YEL "Debug OFF\n" RESET);
+			sprintf((char*)stringDump, YEL "Debug OFF\n" RESET);
 			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
@@ -144,7 +144,7 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			return 1;
 		}else{
 			//PRINT TO CONSOLE
-			sprintf(stringDump, RED "Argument not recognized.\nUsage: help debug\n" RESET);
+			sprintf((char*)stringDump, RED "Argument not recognized.\nUsage: help debug\n" RESET);
 			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 			//Error return code
@@ -152,7 +152,7 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		}
 	}else{
 		//PRINT TO CONSOLE
-		sprintf(stringDump, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
+		sprintf((char*)stringDump, RED "The number of arguments is not correct.\nUsage: help debug\n" RESET);
 		WriteConsole((uint8_t*)stringDump);
 		//END PRINT TO CONSOLE
 		//Error return code
@@ -173,7 +173,7 @@ int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 		//Debug messages display depends on DebugLevel variable
 		if(DebugLevel){
-			sprintf(stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			sprintf((char*)stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
 			WriteConsole((uint8_t*)stringDump);
 		}
 
@@ -181,19 +181,19 @@ int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		const command_s* Command_p = GetCommandByName((int8_t*)ArgStrings[0]);
 
 		if(Command_p == NULL){
-			sprintf(stringDump, RED "Command \"%s\" not found.\n" RESET, ArgStrings[0]);
+			sprintf((char*)stringDump, RED "Command \"%s\" not found.\n" RESET, ArgStrings[0]);
 			WriteConsole((uint8_t*)stringDump);
 			return 0;
 		}else{
 
 			//Print the actual function's help message
-			sprintf(stringDump, CYN "Usage: %s \n" RESET, (char*)Command_p->HelpString);
+			sprintf((char*)stringDump, CYN "Usage: %s \n" RESET, (char*)Command_p->HelpString);
 			WriteConsole((uint8_t*)stringDump);
 			return 1;
 		}
 
 	}else{
-		sprintf(stringDump, RED "The number of arguments is not correct. Usage: help help" RESET);
+		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help help" RESET);
 		WriteConsole((uint8_t*)stringDump);
 		//Error return code
 		return 0;
@@ -376,7 +376,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	if(ArgNum == 3){
 
 		if(DebugLevel){
-			sprintf(stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			sprintf((char*)stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
 			WriteConsole((uint8_t*)stringDump);
 			//osDelay(10);
 		}
@@ -384,7 +384,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		if(IsNumber(ArgStrings[0]) && IsNumber(ArgStrings[1])){
 
 			if(DebugLevel){
-				sprintf(stringDump, GRN "Arguments are numbers.\n" RESET);
+				sprintf((char*)stringDump, GRN "Arguments are numbers.\n" RESET);
 				WriteConsole((uint8_t*)stringDump);
 			}
 
@@ -400,11 +400,11 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			sscanf((char*)ArgStrings[2], "%d", (int*)&ToneDuration);
 
 			if(DebugLevel){
-				sprintf(stringDump, "Typed tone frequency: %f Hz\n", ToneFrequency);
+				sprintf((char*)stringDump, "Typed tone frequency: %f Hz\n", ToneFrequency);
 				WriteConsole((uint8_t*)stringDump);
-				sprintf(stringDump, "Typed tone volume: %d%%\n", ToneVolume);
+				sprintf((char*)stringDump, "Typed tone volume: %d%%\n", ToneVolume);
 				WriteConsole((uint8_t*)stringDump);
-				sprintf(stringDump, "Typed tone duration: %d seconds\n", ToneDuration);
+				sprintf((char*)stringDump, "Typed tone duration: %d seconds\n", ToneDuration);
 				WriteConsole((uint8_t*)stringDump);
 			}
 
@@ -439,11 +439,11 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				ToneFrequency = (float)ToneFrequency *2*3.14;
 
 				if(DebugLevel){
-					sprintf(stringDump, "Acquired tone frequency: %f rad/s\n", (float)ToneFrequency);
+					sprintf((char*)stringDump, "Acquired tone frequency: %f rad/s\n", (float)ToneFrequency);
 					WriteConsole((uint8_t*)stringDump);
-					sprintf(stringDump, "Acquired numerical tone volume: %d over 32767\n", ToneVolume);
+					sprintf((char*)stringDump, "Acquired numerical tone volume: %d over 32767\n", ToneVolume);
 					WriteConsole((uint8_t*)stringDump);
-					sprintf(stringDump, "Acquired tone duration: %d seconds\n", ToneDuration);
+					sprintf((char*)stringDump, "Acquired tone duration: %d seconds\n", ToneDuration);
 					WriteConsole((uint8_t*)stringDump);
 				}
 
@@ -471,7 +471,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				audioSecondsRemaining = ToneDuration;
 				lastPlaybackSecond = audioSecondsRemaining;
 
-				sprintf(stringDump, "%d s ... \n", lastPlaybackSecond);
+				sprintf((char*)stringDump, "%d s ... \n", lastPlaybackSecond);
 				WriteConsole((uint8_t*)stringDump);
 
 				//Sending the pointer for the initial buffer to the audio manager
@@ -500,7 +500,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 					previousBufferPtr = currentBufferPtr;
 
 					if(lastPlaybackSecond != audioSecondsRemaining){
-						sprintf(stringDump, "%d s ... \n", (int)audioSecondsRemaining);
+						sprintf((char*)stringDump, "%d s ... \n", (int)audioSecondsRemaining);
 						WriteConsole((uint8_t*)stringDump);
 						lastPlaybackSecond = audioSecondsRemaining;
 					}
@@ -519,18 +519,18 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				return 1;
 
 			}else{
-				sprintf(stringDump, RED "One of the arguments is out of bounds.\n0 <= Frequency <= 4000\n0 <= Volume <= 100\n0 <= Duration\n" RESET);
+				sprintf((char*)stringDump, RED "One of the arguments is out of bounds.\n0 <= Frequency <= 4000\n0 <= Volume <= 100\n0 <= Duration\n" RESET);
 				WriteConsole((uint8_t*)stringDump);
 				return 0;
 			}
 		}else{
-			sprintf(stringDump, RED "Arguments are not numbers.\n" RESET);
+			sprintf((char*)stringDump, RED "Arguments are not numbers.\n" RESET);
 			WriteConsole((uint8_t*)stringDump);
 			return 0;
 		}
 
 	}else{
-		sprintf(stringDump, RED "The number of arguments is not correct. Usage: help tone.\n" RESET);
+		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help tone.\n" RESET);
 		WriteConsole((uint8_t*)stringDump);
 		return 0;
 	}
@@ -542,14 +542,14 @@ int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
 
-			strcpy(directoryBuffer, );
+			//strcpy(directoryBuffer, );
 			if ((res = f_opendir(&dir, SD_Path )) != FR_OK){                                   //Open the current directory
 
 				WriteConsole((uint8_t*)"ERROR: Opening Directory");
 				return 0;
 			}
 
-
+	}
 	return 1;
 }
 
@@ -566,7 +566,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		WriteConsole((uint8_t*)"ERROR: Opening Directory");
 	}
 	//res = f_opendir(&dir, //SD_Path ); //Open the current directory
-	sprintf(stringDump,"%s\n", SD_Path);
+	sprintf((char*)stringDump,"%s\n", SD_Path);
 	WriteConsole((uint8_t*)stringDump);
 
 		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
@@ -585,16 +585,16 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				WriteConsole((uint8_t*)fno.lfname);
 			}
 			if (fno.fattrib & AM_DIR){ //If it is a directory
-				sprintf(stringDump,YEL " (Folder)\n"RESET);
+				sprintf((char*)stringDump,YEL " (Folder)\n"RESET);
 				WriteConsole((uint8_t *)stringDump);
 				FolderCount++;
 			}else{
-				sprintf(stringDump,YEL " (%d bytes)\n"RESET, fno.fsize);
+				sprintf((char*)stringDump,YEL " (%d bytes)\n"RESET, fno.fsize);
 				WriteConsole((uint8_t *)stringDump);
 				FileCount++;
 			}
 		}
-		sprintf(stringDump, YEL "Folders: %d\nFiles: %d" RESET, FolderCount, FileCount);
+		sprintf((char*)stringDump, YEL "Folders: %d\nFiles: %d" RESET, FolderCount, FileCount);
 		WriteConsole((uint8_t *)stringDump);
 		f_closedir(&dir);
 		FolderCount = 0;
@@ -607,24 +607,36 @@ int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	if(ArgNum == 1){
 
 		if(DebugLevel){
-			sprintf(stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			sprintf((char*)stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
 			WriteConsole((uint8_t*)stringDump);
 		}
 
 		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
 		uint8_t* pwdCopy[PATH_BUFFER_SIZE + 100] = {0};
-		strcpy(pwdCopy, pathOfCurrentWorkingDirectory);
+		strcpy((char*)pwdCopy, (char*)pathOfCurrentWorkingDirectory);
 
 		//Concatenate the pwd and the name of the new directory
-		strcat(pwdCopy, ArgStrings[0]);
+		strcat((char*)pwdCopy, (char*)ArgStrings[0]);
 
 		//Creating a constant to meet fatfs functions requirements
-		const TCHAR* pathOfNewDirectory = pwdCopy;
+		const TCHAR* pathOfNewDirectory = (TCHAR*)pwdCopy;
 
 		res = f_mkdir(pathOfNewDirectory);
 
-		switch res
+		if(res != FR_OK){
+			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
+			WriteConsole((uint8_t*)stringDump);
+			return 0;
+		}else{
+			sprintf((char*)stringDump, GRN "New folder: %s\n" RESET, ArgStrings[0]);
+			WriteConsole((uint8_t*)stringDump);
+			return 1;
+		}
 
+	}else{
+		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help mkdir.\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
+		return 0;
 	}
 }
 

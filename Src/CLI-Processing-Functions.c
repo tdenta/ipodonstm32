@@ -5,6 +5,29 @@
 #include "Ass-03.h"
 #include "usart.h"
 
+//Build error strings list for filesystem errors
+const uint8_t* fsErrors[] = {
+		(uint8_t*)"OK\n",
+		(uint8_t*)"A hard error occurred in the low level disk I/O layer.\n",
+		(uint8_t*)"Assertion failed.\n",
+		(uint8_t*)"The physical drive cannot work.\n",
+		(uint8_t*)"Could not find the file.\n",
+		(uint8_t*)"Could not find the path.\n",
+		(uint8_t*)"The path name format is invalid.\n",
+		(uint8_t*)"Access denied due to prohibited access or directory full.\n",
+		(uint8_t*)"Access denied due to prohibited access.\n",
+		(uint8_t*)"The file/directory object is invalid.\n",
+		(uint8_t*)"The physical drive is write protected.\n",
+		(uint8_t*)"The logical drive number is invalid.\n",
+		(uint8_t*)"The volume has no work area.\n",
+		(uint8_t*)"There is no valid FAT volume.\n",
+		(uint8_t*)"The f_mkfs() aborted due to any parameter error.\n",
+		(uint8_t*)"Could not get a grant to access the volume within defined period.\n",
+		(uint8_t*)"The operation is rejected according to the file sharing policy.\n",
+		(uint8_t*)"LFN working buffer could not be allocated.\n",
+		(uint8_t*)"Number of open files > _FS_SHARE.\n",
+		(uint8_t*)"Given parameter is invalid.\n"
+};
 
 //Build command list
 const command_s CommandList[] = {
@@ -18,6 +41,7 @@ const command_s CommandList[] = {
 		{(int8_t*) "tone", &ToneFunction, (int8_t*) "tone <frequency[Hz]> <volume[%]> <duration[s]>"},
 		{(int8_t*) "cd", &LsFunction, (int8_t*) "cd <directory>"},
 		{(int8_t*) "ls", &LsFunction, (int8_t*) "List current folder contents <no arguments>"},
+		{(int8_t*)"mkdir", &MkdirFunction, (int8_t*)"mkdir <name_of_new_folder>"},
 		{NULL, NULL, NULL}
 };
 
@@ -38,7 +62,7 @@ void CommandLineParserInit(void)
 {
 	// Print welcome message
 	WriteConsole((uint8_t *)"\014");
-	sprintf(stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
+	sprintf((char*)stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
 	WriteConsole((uint8_t*)stringDump);
 	WriteConsole((uint8_t *)"> $  ");
 }
@@ -67,7 +91,7 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 
 		if(Command_p == NULL){
 
-			sprintf(stringDump, RED"Command \"%s\" not found.\n" RESET, ArgsArray[0]);
+			sprintf((char*)stringDump, RED"Command \"%s\" not found.\n" RESET, ArgsArray[0]);
 			WriteConsole((uint8_t*)stringDump);
 
 			ReturnCode = -1;
@@ -82,7 +106,7 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 			if(CommandResult == 0){
 
 				//PRINT TO CONSOLE
-				sprintf(stringDump,  RED"An error has occurred executing the command.\n"RESET );
+				sprintf((char*)stringDump,  RED"An error has occurred executing the command.\n"RESET );
 				WriteConsole((uint8_t*)stringDump);
 				//END PRINT TO CONSOLE
 
@@ -91,7 +115,7 @@ int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]){
 		}
 
 	}else{
-		sprintf(stringDump, YEL "Please type something.\n"RESET );
+		sprintf((char*)stringDump, YEL "Please type something.\n"RESET );
 		WriteConsole((uint8_t*)stringDump);
 		ReturnCode = -3;
 	}
