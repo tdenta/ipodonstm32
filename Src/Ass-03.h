@@ -129,5 +129,6 @@ extern int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
+extern int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 
 #endif /* ASS_03_H_ */

@@ -642,3 +642,44 @@ int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
+int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+	if(ArgNum == 1){
+
+		if(DebugLevel){
+			sprintf((char*)stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump);
+		}
+
+/*		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
+		uint8_t* pwdCopy[PATH_BUFFER_SIZE + 100] = {0};
+		strcpy((char*)pwdCopy, (char*)pathOfCurrentWorkingDirectory);
+
+		//Concatenate the pwd and the name of the new directory
+		strcat((char*)pwdCopy, (char*)ArgStrings[0]);
+
+		//Creating a constant to meet fatfs functions requirements
+		const TCHAR* pathOfNewDirectory = (TCHAR*)pwdCopy;
+
+		res = f_mkdir(pathOfNewDirectory);*/
+
+		//Warning!!!!!!!!!-This function relies on relative paths
+
+		res = f_unlink((TCHAR*)ArgStrings[0]);
+
+		if(res != FR_OK){
+			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
+			WriteConsole((uint8_t*)stringDump);
+			return 0;
+		}else{
+			sprintf((char*)stringDump, GRN "File/folder deleted: %s\n" RESET, ArgStrings[0]);
+			WriteConsole((uint8_t*)stringDump);
+			return 1;
+		}
+
+	}else{
+		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help rm.\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
+		return 0;
+	}
+}
+
