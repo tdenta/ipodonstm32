@@ -604,7 +604,27 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 }
 
 int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+	if(ArgNum == 1){
 
-return 1;
+		if(DebugLevel){
+			sprintf(stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump);
+		}
+
+		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
+		uint8_t* pwdCopy[PATH_BUFFER_SIZE + 100] = {0};
+		strcpy(pwdCopy, pathOfCurrentWorkingDirectory);
+
+		//Concatenate the pwd and the name of the new directory
+		strcat(pwdCopy, ArgStrings[0]);
+
+		//Creating a constant to meet fatfs functions requirements
+		const TCHAR* pathOfNewDirectory = pwdCopy;
+
+		res = f_mkdir(pathOfNewDirectory);
+
+		switch res
+
+	}
 }
 
