@@ -538,13 +538,16 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
-//		if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
-//
-//			strcat(ArgString[0], )
-//			f_chdir(SD_Path);
-//			WriteConsole((uint8_t*));
-//		}
+	char directoryBuffer[PATH_BUFFER_SIZE];
 
+	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
+
+			strcpy(directoryBuffer, );
+			if ((res = f_opendir(&dir, SD_Path )) != FR_OK){                                   //Open the current directory
+
+				WriteConsole((uint8_t*)"ERROR: Opening Directory");
+				return 0;
+			}
 
 
 	return 1;
@@ -602,4 +605,6 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
+return 1;
 }
+
