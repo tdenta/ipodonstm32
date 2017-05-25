@@ -152,7 +152,7 @@
 /  memory for the working buffer, memory management functions, ff_memalloc() and
 /  ff_memfree(), must be added to the project. */
 
-#define _LFN_UNICODE    0 /* 0:ANSI/OEM or 1:Unicode */
+#define _LFN_UNICODE    0/* 0:ANSI/OEM or 1:Unicode */
 /* This option switches character encoding on the API. (0:ANSI/OEM or 1:Unicode)
 /  To use Unicode string for the path name, enable LFN feature and set _LFN_UNICODE
 /  to 1. This option also affects behavior of string I/O functions. */
@@ -168,7 +168,7 @@
 /
 /  When _LFN_UNICODE is 0, this option has no effect. */
 
-#define _FS_RPATH       0 /* 0 to 2 */
+#define _FS_RPATH       2 /* 0 to 2 */
 /* This option configures relative path feature.
 /
 /   0: Disable relative path feature and remove related functions.
