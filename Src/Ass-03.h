@@ -79,6 +79,7 @@ extern void ReadConsole(uint8_t *c);
 #define BUFFER_MAX_SIZE 100
 #define AUDIO_BUFFER_SIZE 512
 #define SAMPLE_FREQ 8000
+#define PATH_BUFFER_SIZE 300
 
 //User structures & global variables
 typedef struct{
@@ -113,6 +114,7 @@ extern uint8_t stringDump[300];
 extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
 extern FATFS SDFatFs;
+extern uint8_t pathOfCurrentWorkingDirectory[300];
 
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
