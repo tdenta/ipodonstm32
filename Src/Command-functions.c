@@ -554,41 +554,50 @@ int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	int error = 0;
+	static TCHAR LongFileName[_MAX_LFN];
+	static int FolderCount = 0;
+	static int FileCount = 0;
 
-	WriteConsole((uint8_t*)"Hello from LsFunction\n");
 
-	if ((res = f_opendir(&dir, "0:/" )) != FR_OK){                                   //Open the current directory
+	if ((res = f_opendir(&dir, SD_Path )) != FR_OK){                                   //Open the current directory
 
 		WriteConsole((uint8_t*)"ERROR: Opening Directory");
 	}
 	//res = f_opendir(&dir, //SD_Path ); //Open the current directory
-	sprintf(stringDump, RED "\nError # %d\n" RESET, error);
+	sprintf(stringDump,"%s\n", SD_Path);
 	WriteConsole((uint8_t*)stringDump);
-	if(res  == FR_OK){ //Error check
-		WriteConsole((uint8_t*)"Hello from LsFunction2\n");
-		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
-			res = f_readdir(&dir, &fno);
-			if(res !=  FR_OK || fno.fname[0] == 0) break;
-			if(fno.lfname[0] == 0 ){
-				WriteConsole((uint8_t*)fno.fname);
-				WriteConsole((uint8_t*)"\n");
-			}else{
-				WriteConsole((uint8_t*)"SUPPPP");
-				WriteConsole((uint8_t*)fno.lfname);
-				WriteConsole((uint8_t*)"\n");
-			}
-			//			if (fno.fattrib & AM_DIR){ //If it is a directory
-			//				WriteConsole((uint8_t*)SD_Path);
-			//				WriteConsole((uint8_t *)"\t(Folder)");
-			//
-			//			}else{
-			//				WriteConsole((uint8_t*)fno.fname);
-			//				WriteConsole((uint8_t *)"\t(File)");
-			//			}
-		}
-		f_closedir(&dir);
-	}
 
-	return res;
+		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
+		//while(res == FR_OK  && fno.lfname[0] != 0){
+			fno.lfname = LongFileName;
+			fno.lfsize = _MAX_LFN-1;
+
+			res = f_readdir(&dir, &fno);
+
+			if(res !=  FR_OK || fno.lfname[0] == 0) break;
+
+			if(fno.fname[0] == 0 ){
+				WriteConsole((uint8_t*)fno.fname);
+
+			}else{
+				WriteConsole((uint8_t*)fno.lfname);
+			}
+			if (fno.fattrib & AM_DIR){ //If it is a directory
+				sprintf(stringDump,YEL " (Folder)\n"RESET);
+				WriteConsole((uint8_t *)stringDump);
+				FolderCount++;
+			}else{
+				sprintf(stringDump,YEL " (%d bytes)\n"RESET, fno.fsize);
+				WriteConsole((uint8_t *)stringDump);
+				FileCount++;
+			}
+		}
+		sprintf(stringDump, YEL "Folders: %d\nFiles: %d" RESET, FolderCount, FileCount);
+		WriteConsole((uint8_t *)stringDump);
+		f_closedir(&dir);
+		FolderCount = 0;
+		FileCount = 0;
+
+	return 1;
 }
 
