@@ -31,12 +31,16 @@ FATFS SDFatFs;
 //Variable to say if file system was mounted correctly
 FRESULT fileSystemMounted;
 
+uint8_t pathOfCurrentWorkingDirectory[PATH_BUFFER_SIZE];
+
 
 void CommandLineParserInit(void)
 {
 	// Print welcome message
-	//WriteConsole((uint8_t *)"\014");
-	WriteConsole((uint8_t *)"\n>>> Enter a command > ");
+	WriteConsole((uint8_t *)"\014");
+	sprintf(stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
+	WriteConsole((uint8_t*)stringDump);
+	WriteConsole((uint8_t *)"> $  ");
 }
 
 /*
@@ -309,6 +313,9 @@ int8_t SDCardInit(void){
 		WriteConsole((uint8_t *)GRN"Mounted file system: ");
 		WriteConsole((uint8_t *)SD_Path);
 		WriteConsole((uint8_t *)"\n"RESET);
+
+		strcpy((char*)pathOfCurrentWorkingDirectory, (char*)SD_Path);
+
 		return 1;
 	}
 }

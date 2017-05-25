@@ -600,3 +600,6 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	return 1;
 }
 
+int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+
+}
