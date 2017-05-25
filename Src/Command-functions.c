@@ -563,12 +563,12 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
 			res = f_readdir(&dir, &fno);
 			if(res !=  FR_OK || fno.fname[0] == 0) break;
-			WriteConsole((uint8_t*)fno.fname);
-			WriteConsole((uint8_t*)"\n");
 			if(fno.lfname[0] == 0 ){
 				WriteConsole((uint8_t*)fno.fname);
+				WriteConsole((uint8_t*)"\n");
 			}else{
 				WriteConsole((uint8_t*)fno.lfname);
+				WriteConsole((uint8_t*)"\n");
 			}
 			//			if (fno.fattrib & AM_DIR){ //If it is a directory
 			//				WriteConsole((uint8_t*)SD_Path);
