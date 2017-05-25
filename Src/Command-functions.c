@@ -576,7 +576,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			res = f_readdir(&dir, &fno);
 
-			if(res !=  FR_OK || fno.lfname[0] == 0) break;
+			if(res !=  FR_OK || fno.fname[0] == 0) break;
 
 			if(fno.fname[0] == 0 ){
 				WriteConsole((uint8_t*)fno.fname);
@@ -611,7 +611,7 @@ int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			WriteConsole((uint8_t*)stringDump);
 		}
 
-		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
+/*		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
 		uint8_t* pwdCopy[PATH_BUFFER_SIZE + 100] = {0};
 		strcpy((char*)pwdCopy, (char*)pathOfCurrentWorkingDirectory);
 
@@ -621,7 +621,9 @@ int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		//Creating a constant to meet fatfs functions requirements
 		const TCHAR* pathOfNewDirectory = (TCHAR*)pwdCopy;
 
-		res = f_mkdir(pathOfNewDirectory);
+		res = f_mkdir(pathOfNewDirectory);*/
+
+		res = f_mkdir((TCHAR*)ArgStrings[0]);
 
 		if(res != FR_OK){
 			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
