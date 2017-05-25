@@ -538,19 +538,18 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
-
-	FRESULT res;
-
-	//	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
-	//
-	//		f_chdir(SD_Path);
-	//		WriteConsole((uint8_t*)path);
-	//	}
+//		if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
+//
+//			strcat(ArgString[0], )
+//			f_chdir(SD_Path);
+//			WriteConsole((uint8_t*));
+//		}
 
 
 
-	return 0;
+	return 1;
 }
+
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	int error = 0;
