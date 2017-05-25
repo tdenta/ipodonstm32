@@ -559,7 +559,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	sprintf(stringDump, RED "\nError # %d\n" RESET, error);
 	WriteConsole((uint8_t*)stringDump);
 	if(res  == FR_OK){ //Error check
-		WriteConsole((uint8_t*)"Hello from LsFunction2");
+		WriteConsole((uint8_t*)"Hello from LsFunction2\n");
 		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
 			res = f_readdir(&dir, &fno);
 			if(res !=  FR_OK || fno.fname[0] == 0) break;
@@ -567,6 +567,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 				WriteConsole((uint8_t*)fno.fname);
 				WriteConsole((uint8_t*)"\n");
 			}else{
+				WriteConsole((uint8_t*)"SUPPPP");
 				WriteConsole((uint8_t*)fno.lfname);
 				WriteConsole((uint8_t*)"\n");
 			}
