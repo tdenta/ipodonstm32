@@ -12,6 +12,12 @@ uint8_t stringDump[300] = {0};
 
 void CommandLineListener(void const * argument)
 {
+	if(SDCardInit()){
+		WriteConsole((uint8_t*)GRN"SD Card successfully initialized.\n"RESET);
+	}else{
+		WriteConsole((uint8_t*)RED"SD Card init failed.\n"RESET);
+	}
+
 	CommandLineParserInit();
 
 	//Initialize the buffer for typing commands

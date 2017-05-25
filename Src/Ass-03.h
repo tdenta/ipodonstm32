@@ -105,11 +105,14 @@ extern int8_t IsFloatNumber(uint8_t* string);
 
 extern int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]);
 
+extern int8_t SDCardInit(void);
+
 extern int8_t continueReadingFlag;
 extern int32_t audioSecondsRemaining;
 extern uint8_t stringDump[300];
 extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
+extern FATFS SDFatFs;
 
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);

@@ -26,6 +26,11 @@ const command_s CommandList[] = {
 int8_t buffer[BUFFER_MAX_SIZE];
 //Cursor intended to keep track of the insertion point for new characters coming
 int8_t BufferCursor = 0;
+//Variable to store references to the mounted file system
+FATFS SDFatFs;
+//Variable to say if file system was mounted correctly
+FRESULT fileSystemMounted;
+
 
 void CommandLineParserInit(void)
 {
@@ -279,5 +284,31 @@ int8_t IsFloatNumber(uint8_t* string){
 		}
 	}else{
 		return 0;
+	}
+}
+
+/*
+ * Function SDCardInit
+ *Returns 1 if success, 0 otherwise
+ */
+int8_t SDCardInit(void){
+	//Checking if the SD card itself is available
+	if(retSD!=0){
+		WriteConsole((uint8_t *)RED"ERROR: SD card not inserted."RESET);
+		return 0;
+	}else{
+		WriteConsole((uint8_t *)GRN"SD card inserted."RESET);
+	}
+
+	// Mount file system
+	if((fileSystemMounted = f_mount(&SDFatFs, (TCHAR const *)SD_Path, 0)) != FR_OK)
+	{
+		WriteConsole((uint8_t *)RED "ERROR: Could not mount file system.\n"RESET);
+		return 0;
+	}else{
+		WriteConsole((uint8_t *)GRN"Mounted file system: ");
+		WriteConsole((uint8_t *)SD_Path);
+		WriteConsole((uint8_t *)"\n"RESET);
+		return 1;
 	}
 }
