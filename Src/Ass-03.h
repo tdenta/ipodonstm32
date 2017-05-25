@@ -80,6 +80,7 @@ extern void ReadConsole(uint8_t *c);
 #define AUDIO_BUFFER_SIZE 512
 #define SAMPLE_FREQ 8000
 #define PATH_BUFFER_SIZE 300
+#define FILE_BUFFER_SIZE 4
 
 //User structures & global variables
 typedef struct{
@@ -117,6 +118,10 @@ extern FATFS SDFatFs;
 extern uint8_t pathOfCurrentWorkingDirectory[300];
 extern const uint8_t* fsErrors[];
 
+//Variables used in the copy function
+extern FIL fsrc, fdst;      /* File objects */
+//extern BYTE cpbuffer[FILE_BUFFER_SIZE];   /* File copy buffer */
+
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
@@ -130,5 +135,6 @@ extern int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
+extern int8_t CpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 
 #endif /* ASS_03_H_ */

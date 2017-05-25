@@ -9,6 +9,8 @@
 FILINFO fno;
 FRESULT res;
 DIR dir;
+//Variables used in the copy function
+FIL fsrc, fdst;      /* File objects */
 
 //DebugLevel variable is used for the debug mode
 uint8_t DebugLevel = 0;
@@ -678,6 +680,97 @@ int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	}else{
 		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help rm.\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
+		return 0;
+	}
+}
+
+/*
+ * Function CpFunction
+ * Copies a file to a destination
+ * Widely inspired by http://elm-chan.org/fsw/ff/doc/open.html
+ */
+int8_t CpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+	if(ArgNum == 2){
+
+		if(DebugLevel){
+			sprintf((char*)stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump);
+		}
+
+/*		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
+		uint8_t* pwdCopy[PATH_BUFFER_SIZE + 100] = {0};
+		strcpy((char*)pwdCopy, (char*)pathOfCurrentWorkingDirectory);
+
+		//Concatenate the pwd and the name of the new directory
+		strcat((char*)pwdCopy, (char*)ArgStrings[0]);
+
+		//Creating a constant to meet fatfs functions requirements
+		const TCHAR* pathOfNewDirectory = (TCHAR*)pwdCopy;
+
+		res = f_mkdir(pathOfNewDirectory);*/
+
+		//Warning!!!!!!!!!-This function relies on relative paths
+
+		UINT br, bw;         /* File read/write count */
+		BYTE cpbuffer[FILE_BUFFER_SIZE];   /* File copy buffer */
+
+		//Open the file to be copied (source file)
+		res = f_open(&fsrc, (TCHAR*)ArgStrings[0], FA_READ);
+
+		//Check if it was successful
+		if(res != FR_OK){
+					sprintf((char*)stringDump, RED "FS Error on source file: %s" RESET, fsErrors[res]);
+					WriteConsole((uint8_t*)stringDump);
+					return 0;
+		}
+
+		//Create the destination file and open it in write mode
+		res = f_open(&fdst, (TCHAR*)ArgStrings[1], FA_CREATE_NEW | FA_WRITE);
+
+		//Check if it was successful
+		if(res != FR_OK){
+			sprintf((char*)stringDump, RED "FS Error on destination file: %s" RESET, fsErrors[res]);
+			WriteConsole((uint8_t*)stringDump);
+			return 0;
+		}
+
+		/* Copy source to destination */
+		for (;;) {
+			if(DebugLevel) WriteConsole((uint8_t*)"Reading chunk ...\n");
+			res = f_read(&fsrc, cpbuffer, sizeof cpbuffer, &br);  /* Read a chunk of source file */
+
+			if (res != FR_OK || br == 0){
+				if(DebugLevel) WriteConsole((uint8_t*)"Breaking on reading error or eof\n");
+				break; /* error or eof : exit*/
+			}
+
+			if(DebugLevel) WriteConsole((uint8_t*)"Writing chunk ...\n");
+			res = f_write(&fdst, cpbuffer, br, &bw);            /* Write it to the destination file */
+
+			if (res != FR_OK || bw < br){
+				if(DebugLevel) WriteConsole((uint8_t*)"Breaking on writing error or disk full\n");
+				break; /* error or disk full : exit */
+			}
+		}
+
+		/* Close open files */
+		f_close(&fsrc);
+		f_close(&fdst);
+		if(DebugLevel) WriteConsole((uint8_t*)"Files closed\n");
+
+		if(res == FR_OK){
+			sprintf((char*)stringDump, CYN "%s" GRN " successfully copied into" CYN " %s.\n" RESET, ArgStrings[0], ArgStrings[1]);
+			WriteConsole((uint8_t*)stringDump);
+			return 1;
+		}else{
+			sprintf((char*)stringDump, RED "FS Error during copy: %s" RESET, fsErrors[res]);
+			WriteConsole((uint8_t*)stringDump);
+			return 0;
+		}
+
+	}else{
+		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help cp.\n" RESET);
 		WriteConsole((uint8_t*)stringDump);
 		return 0;
 	}

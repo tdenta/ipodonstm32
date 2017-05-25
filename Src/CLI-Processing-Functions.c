@@ -43,6 +43,7 @@ const command_s CommandList[] = {
 		{(int8_t*) "ls", &LsFunction, (int8_t*) "List current folder contents <no arguments>"},
 		{(int8_t*)"mkdir", &MkdirFunction, (int8_t*)"mkdir <name_of_new_folder>"},
 		{(int8_t*)"rm", &RmFunction, (int8_t*)"rm <name_of_file/folder_to_delete>"},
+		{(int8_t*)"cp", &CpFunction, (int8_t*)"cp <source_file> <destination_file>"},
 		{NULL, NULL, NULL}
 };
 
