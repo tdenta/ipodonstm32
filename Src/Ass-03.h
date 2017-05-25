@@ -113,8 +113,9 @@ extern int32_t audioSecondsRemaining;
 extern uint8_t stringDump[300];
 extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
-extern FATFS SDFatFs;
 extern uint8_t pathOfCurrentWorkingDirectory[300];
+extern FATFS SDFatFs;
+
 
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
