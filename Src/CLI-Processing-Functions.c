@@ -39,8 +39,8 @@ const command_s CommandList[] = {
 		{(int8_t*) "mul", &MulFunction, (int8_t*)"mul <num1> <num2>"},
 		{(int8_t*) "list", &ListFunction, (int8_t*)"list _no-arguments_"},
 		{(int8_t*) "tone", &ToneFunction, (int8_t*) "tone <frequency[Hz]> <volume[%]> <duration[s]>"},
-		{(int8_t*) "cd", &cdFunction, (int8_t*) "cd <directory>"},
-		{(int8_t*) "ls", &LsFunction, (int8_t*) "List current folder contents <no arguments>"},
+		{(int8_t*) "cd", &CdFunction, (int8_t*) "cd <directory>"},
+		{(int8_t*) "ls", &LsFunction, (int8_t*) "ls _no-arguments_"},
 		{(int8_t*)"mkdir", &MkdirFunction, (int8_t*)"mkdir <name_of_new_folder>"},
 		{(int8_t*)"rm", &RmFunction, (int8_t*)"rm <name_of_file/folder_to_delete>"},
 		{(int8_t*)"cp", &CpFunction, (int8_t*)"cp <source_file> <destination_file>"},
@@ -66,7 +66,7 @@ void CommandLineParserInit(void)
 	WriteConsole((uint8_t *)"\014");
 	sprintf((char*)stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
 	WriteConsole((uint8_t*)stringDump);
-	WriteConsole((uint8_t *)"> $  ");
+	WriteConsole((uint8_t *)" > $  ");
 }
 
 /*
@@ -340,7 +340,8 @@ int8_t SDCardInit(void){
 		WriteConsole((uint8_t *)SD_Path);
 		WriteConsole((uint8_t *)"\n"RESET);
 
-		strcpy((char*)pathOfCurrentWorkingDirectory, (char*)SD_Path);
+		//Update the path global variable for displaying purposes
+		strcpy((char*)pathOfCurrentWorkingDirectory, (char*)"/");
 
 		return 1;
 	}

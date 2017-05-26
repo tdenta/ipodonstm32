@@ -115,12 +115,8 @@ extern uint8_t stringDump[300];
 extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
 extern uint8_t pathOfCurrentWorkingDirectory[300];
-<<<<<<< HEAD
 extern FATFS SDFatFs;
-
-=======
 extern const uint8_t* fsErrors[];
->>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 
 //Variables used in the copy function
 extern FIL fsrc, fdst;      /* File objects */
@@ -135,7 +131,7 @@ extern int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
+extern int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);

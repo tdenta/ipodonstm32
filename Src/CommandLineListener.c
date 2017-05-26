@@ -56,7 +56,7 @@ void CommandLineListener(void const * argument)
 
 			sprintf(stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
 			WriteConsole((uint8_t*)stringDump);
-			WriteConsole((uint8_t *)"> $  ");
+			WriteConsole((uint8_t *)" > $  ");
 
 			//Verify then that \n is being passed or not in order not to put it in the buffer (avoids extra processing)
 			//13 is ascii code for new line
@@ -93,7 +93,7 @@ void CommandLineListener(void const * argument)
 
 			sprintf(stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
 			WriteConsole((uint8_t*)stringDump);
-			WriteConsole((uint8_t *)"> $  ");
+			WriteConsole((uint8_t *)" > $  ");
 
 			//DEBUG CODE
 			//printf("Got the output: %f and error code %d \n", output, ErrorCode);

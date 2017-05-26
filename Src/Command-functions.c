@@ -6,9 +6,8 @@
  */
 
 #include "Ass-03.h"
-FILINFO fno;
 FRESULT res;
-DIR dir;
+
 //Variables used in the copy function
 FIL fsrc, fdst;      /* File objects */
 
@@ -538,51 +537,50 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
-int8_t cdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+	if(ArgNum == 1){
 
+		if(DebugLevel){
+			sprintf((char*)stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
+			WriteConsole((uint8_t*)stringDump);
+		}
 
-	if(ArgNum == 1 && (res = f_stat(ArgStrings[0], &fno)) == FR_OK ){
-		//Creating a copy of the current working directory path, because we are going to build the full path from it and the argument and we don't want to modify the clean current path
-			//uint8_t* pwdCopy[PATH_BUFFER_SIZE + 100] = {0};
-			//strcpy(pwdCopy, pathOfCurrentWorkingDirectory);
-		TCHAR buff[100];
-		char c = '/';
-			//Concatenate the pwd and the name of the new directory
-			//strcat(pwdCopy, ArgStrings[0]);
+		//Change working directory
+		res = f_chdir((TCHAR*)ArgStrings[0]);
 
-		if ((res = f_opendir(&dir, pathOfCurrentWorkingDirectory )) != FR_OK){                                   //Open the current directory
+		//Check if it worked
+		if(res != FR_OK){
+			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
+			WriteConsole((uint8_t*)stringDump);
+			return 0;
+		}else{
+			//Verify new current working directory
+			//Creating a buffer for getcwd
+			TCHAR* CwdBuffer[PATH_BUFFER_SIZE];
 
-				WriteConsole((uint8_t*)"ERROR: Opening Directory");
-			}
+			res = f_getcwd((TCHAR*)CwdBuffer, PATH_BUFFER_SIZE);
 
-			//Creating a constant to meet fatfs functions requirements
-			const TCHAR* pathOfNewDirectory = ArgStrings[0];
-
-<<<<<<< HEAD
-			if ((res = f_chdir(pathOfNewDirectory)) != FR_OK){                                   //Open the current directory
-=======
-			//strcpy(directoryBuffer, );
-			if ((res = f_opendir(&dir, SD_Path )) != FR_OK){                                   //Open the current directory
->>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
-
-				WriteConsole((uint8_t*)"ERROR: Opening Directory");
+			if(res != FR_OK){
+				sprintf((char*)stringDump, RED "FS Error while reading new cwd: %s" RESET, fsErrors[res]);
+				WriteConsole((uint8_t*)stringDump);
 				return 0;
 			}
 
-<<<<<<< HEAD
-			f_getcwd(buff, (UINT)100);
-			//WriteConsole((uint8_t*)buff);
-			strcpy((char*)pathOfCurrentWorkingDirectory, (char*)buff);
-			WriteConsole((uint8_t*)pathOfCurrentWorkingDirectory);
-			f_closedir(&dir);
+			//Update the path global variable for displaying purposes
+			strcpy((char*)pathOfCurrentWorkingDirectory, (char*)CwdBuffer);
+			sprintf((char*)stringDump, GRN "New working directory: %s\n" RESET, (char*)CwdBuffer);
+			if(DebugLevel) WriteConsole((uint8_t*)stringDump);
+			return 1;
+		}
 
-=======
->>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
+	}else{
+		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help cd.\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
+		return 0;
 	}
-	return 1;
 }
 
-int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+/*int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	static TCHAR LongFileName[_MAX_LFN];
 	static int FolderCount = 0;
@@ -648,6 +646,88 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		FolderCount = 0;
 		FileCount = 0;
 	return 1;
+}*/
+
+int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+	if(ArgNum == 0){
+
+		if(DebugLevel){
+			sprintf((char*)stringDump, GRN "No arguments detected, correct.\n" RESET);
+			WriteConsole((uint8_t*)stringDump);
+		}
+
+		//Defining the current directory in terms of relative path
+		const TCHAR* CwdPath = ".";
+		DIR dir;
+		//static is required !!!
+		static FILINFO fno;
+		uint8_t* tempFname[200];
+		//Buffer to store long file names
+		static TCHAR LongFileNameBuffer[_MAX_LFN];
+
+
+
+		//Opening current directory and checking for success
+		res = f_opendir(&dir, CwdPath);
+		if(res != FR_OK){
+			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
+			WriteConsole((uint8_t*)stringDump);
+			return 0;
+		}
+
+		if(DebugLevel) WriteConsole((uint8_t*)"Current directory opened.\n");
+
+		for (;;) {
+
+			//Declaring memory for the long file names as the driver does not do it for us
+			fno.lfname = LongFileNameBuffer;
+			fno.lfsize = _MAX_LFN-1;
+
+			if(DebugLevel) WriteConsole((uint8_t*)"Attempting reading directory record.\n");
+			res = f_readdir(&dir, &fno);                   /* Read a directory item */
+			if(DebugLevel) WriteConsole((uint8_t*)"Read directory record.\n");
+
+			if (res != FR_OK || fno.fname[0] == 0){
+				if(DebugLevel) WriteConsole((uint8_t*)"Breaking on error or end of directory\n");
+				break;  /* Break on error or end of dir */
+			}
+
+			//Selecting correct string
+			//fname always stores the plain old short file name of FAT32, while lfname is populated only if a long file name exists
+			if(DebugLevel) WriteConsole((uint8_t*)"Selecting correct string.\n");
+
+			if(fno.lfname[0] != 0){
+				if(DebugLevel) WriteConsole((uint8_t*)"Long name detected.\n");
+				strcpy((char*)tempFname, (char*)fno.lfname);
+				if(DebugLevel) WriteConsole((uint8_t*)"Long name loaded.\n");
+			}else{
+				if(DebugLevel) WriteConsole((uint8_t*)"Short name detected.\n");
+				strcpy((char*)tempFname, (char*)fno.fname);
+				if(DebugLevel) WriteConsole((uint8_t*)"Short name loaded.\n");
+			}
+
+			if (fno.fattrib & AM_DIR) {                     /*It is a directory*/
+				sprintf((char*)stringDump, "| "CYN"Dir"RESET"  |" CYN " %s\n" RESET, (char*)tempFname);
+				WriteConsole((uint8_t*)stringDump);
+			} else {                                        /*It is a file.*/
+				sprintf((char*)stringDump, "| "YEL"File"RESET" | %s", (char*)tempFname);
+				WriteConsole((uint8_t*)stringDump);
+			}
+
+			if(fno.fsize){
+				sprintf((char*)stringDump, " -- " YEL "%d Bytes\n" RESET, (int)fno.fsize);
+				WriteConsole((uint8_t*)stringDump);
+			}
+
+		}
+		f_closedir(&dir);
+		return 1;
+
+	}else{
+		sprintf((char*)stringDump, RED "The number of arguments is not correct. Usage: help mkdir.\n" RESET);
+		WriteConsole((uint8_t*)stringDump);
+		return 0;
+	}
 }
 
 int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
@@ -711,11 +791,7 @@ int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 		//Warning!!!!!!!!!-This function relies on relative paths
 
-<<<<<<< HEAD
-		//switch res
-=======
 		res = f_unlink((TCHAR*)ArgStrings[0]);
->>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
 
 		if(res != FR_OK){
 			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
