@@ -47,6 +47,8 @@ const command_s CommandList[] = {
 		{NULL, NULL, NULL}
 };
 
+
+
 //Initialize the buffer for typing commands
 //Array of chars
 int8_t buffer[BUFFER_MAX_SIZE];

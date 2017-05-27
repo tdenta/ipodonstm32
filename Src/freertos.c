@@ -57,6 +57,7 @@ osThreadId myTask02Handle;
 osThreadId myTask03Handle;
 osThreadId myTaskCommandLineListenerHandle;
 osThreadId audioManagerTaskHandle;
+osThreadId UserInterfaceTaskHandle;
 osMessageQId myQueue01Handle;
 osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
@@ -66,6 +67,7 @@ osSemaphoreId myBinarySem01Handle;
 osSemaphoreId myCountingSem01Handle;
 
 /* USER CODE BEGIN Variables */
+osMessageQId ButtonQueueHandle;
 osMessageQId toneFrequencyQueueHandle;
 osMessageQId toneAmplitudeQueueHandle;
 osMutexId audioBufferMutexHandle;
@@ -85,6 +87,7 @@ void StartTask03(void const * argument);
 void StartCommandLineListener(void const *argument);
 void Callback01(void const * argument);
 void AudioPlaybackCallback(void const* argument);
+void StartUserInterfaceTask(void const* argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -177,6 +180,10 @@ void MX_FREERTOS_Init(void) {
    osThreadDef(AudioManagerTask, StartAudioManagerTask, osPriorityNormal, 0, 512);
    audioManagerTaskHandle = osThreadCreate(osThread(AudioManagerTask), NULL);
 
+   /*definition and creation of UserInterface task */
+   osThreadDef(UserInterfaceTask, StartUserInterfaceTask, osPriorityNormal, 0, 512);
+   UserInterfaceTaskHandle = osThreadCreate(osThread(UserInterfaceTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -197,7 +204,11 @@ void MX_FREERTOS_Init(void) {
   osMessageQDef(audioOutputQueue, 16, uint16_t*);
   audioOutputQueueHandle = osMessageCreate(osMessageQ(audioOutputQueue), NULL);
 
+  osMessageQDef(ButtonQueue, 16, uint16_t);
+  ButtonQueueHandle = osMessageCreate(osMessageQ(ButtonQueue), NULL);
+
   /* USER CODE END RTOS_QUEUES */
+
 }
 
 /* StartDefaultTask function */
@@ -243,6 +254,9 @@ void StartAudioManagerTask(void const * argument){
 	AudioManager(argument);
 }
 
+void StartUserInterfaceTask(void const * argument){
+	UserInterface(argument);
+}
 
 /* Callback01 function */
 void Callback01(void const * argument)

@@ -44,6 +44,7 @@ extern osMutexId serialOutputMutexHandle;
 extern osMutexId DMAControllerMutexHandle;
 extern osMessageQId toneAmplitudeQueueHandle;
 extern osMessageQId toneFrequencyQueueHandle;
+extern osMessageQId ButtonQueueHandle;
 extern osSemaphoreId serialOutputSemHandle;
 
 extern osTimerId audioPlaybackTimerHandle;
@@ -58,6 +59,7 @@ extern void Ass_03_Task_03(void const *argument);
 
 extern void CommandLineListener(void const * argument);
 extern void AudioManager(void const *argument);
+extern void UserInterface(void const *argument);
 
 // Library functions
 extern void WriteConsole(uint8_t *s);
@@ -92,6 +94,14 @@ typedef struct{
 	int8_t *HelpString;						//The help message for the function
 } command_s;
 
+typedef struct{
+	int8_t *ButtonName;
+	int8_t (*ButtonFunction_p)(
+			uint8_t *s,
+			uint8_t *CurrentButton[]);
+}ButtonFuncs;
+
+extern const ButtonFuncs ButtonList[];
 extern const command_s CommandList[];
 
 //User functions prototypes
@@ -136,5 +146,13 @@ extern int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
 extern int8_t CpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
+
+//Button functions
+extern int8_t PlayFunction(uint8_t *s, uint8_t *CurrentButton[]);
+extern int8_t BackFunction(uint8_t *s, uint8_t *CurrentButton[]);
+extern int8_t FwdFunction(uint8_t *s, uint8_t *CurrentButton[]);
+extern int8_t PlaySlctFunction(uint8_t *s, uint8_t *CurrentButton[]);
+extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
+
 
 #endif /* ASS_03_H_ */

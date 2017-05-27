@@ -37,8 +37,18 @@ void CommandLineListener(void const * argument)
 
 		//Print back the character being read
 		char prt1[2];
-	  	sprintf(prt1,"%c",c);
-	  	WriteConsole((uint8_t *)prt1);
+
+		if ((BufferCursor == 0) && (c == 0x7f))
+		{
+
+		}
+		else
+		{
+			sprintf(prt1,"%c",c);
+			WriteConsole((uint8_t *)prt1);
+		}
+
+
 
 		if(BufferCursor == BUFFER_MAX_SIZE-1){//In case of buffer overflow we cannot get the entire command typed
 
@@ -97,6 +107,12 @@ void CommandLineListener(void const * argument)
 
 			//DEBUG CODE
 			//printf("Got the output: %f and error code %d \n", output, ErrorCode);
+		}else if(c == 0x7f){ //Check for backspace and start of buffer
+
+			if (BufferCursor != 0){
+				BufferCursor--;
+			}
+			buffer[BufferCursor] = '\0';
 
 		}else{
 			//Buffer filling code

@@ -4,6 +4,7 @@
 
 #include "Ass-03.h"
 
+
 //
 // REPLACE THE EXAMPLE CODE WITH YOUR CODE
 //
@@ -17,19 +18,27 @@ void Ass_03_Task_01(void const * argument)
   uint32_t loop=0;
   uint8_t ts[100];
 
+
   // Initialize and turn on LCD and calibrate the touch panel (needs to be done first)
   BSP_LCD_Init();
   BSP_LCD_DisplayOn();
 
-  // Display welcome message
+  // Set buttons
   osMutexWait(myMutex01Handle, osWaitForever);
   BSP_LCD_Clear(LCD_COLOR_WHITE);
-  BSP_LCD_SetFont(&Font12);
   BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-  BSP_LCD_DisplayStringAt(5,5, (uint8_t*)"ELEC3730 Assignment 3",LEFT_MODE);
-  BSP_LCD_DisplayStringAt(5,20, (uint8_t*)"Use the joystick for user input",LEFT_MODE);
-  BSP_LCD_DisplayStringAt(5,35, (uint8_t*)"Up/down frequency, centre reset",LEFT_MODE);
-  BSP_LCD_DisplayStringAt(5,50, (uint8_t*)"Sorry, no touch panel this time",LEFT_MODE);
+  BSP_LCD_DrawVLine(  160, 2,  235);
+  BSP_LCD_DrawRect( 170, 30, 40, 60); //Skip back button
+  BSP_LCD_DrawRect( 220, 30, 40, 60);
+  BSP_LCD_DrawRect( 270, 30, 40, 60);
+  BSP_LCD_DrawRect( 170, 150, 140, 60);
+  BSP_LCD_SetFont(&Font20);
+  BSP_LCD_DisplayStringAt(195,160, (uint8_t*)"SELECT",LEFT_MODE);
+  BSP_LCD_DisplayStringAt(184,185, (uint8_t*)"PLAYLIST",LEFT_MODE);
+  BSP_LCD_SetFont(&Font12);
+//
+//
+//
   osMutexRelease(myMutex01Handle);
 
   //WriteConsole((uint8_t *)"Hello from Task 1\n");
@@ -45,6 +54,7 @@ void Ass_03_Task_01(void const * argument)
     {
       if (s[i] != p[i])
       {
+    	  osMessagePut(ButtonQueueHandle, i, 0);
         if (s[i] == GPIO_PIN_SET)
         {
            osMutexWait(myMutex01Handle, osWaitForever);
@@ -63,7 +73,7 @@ void Ass_03_Task_01(void const * argument)
       }
       sprintf((char*)ts,"Task 1: %d",(int)loop);
       osMutexWait(myMutex01Handle, osWaitForever);
-      BSP_LCD_DisplayStringAt(5,190, ts, LEFT_MODE);
+      //BSP_LCD_DisplayStringAt(5,190, ts, LEFT_MODE);
       osMutexRelease(myMutex01Handle);
       loop++;
       // STEPIEN: Signal received from timer
