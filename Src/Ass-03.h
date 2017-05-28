@@ -92,10 +92,17 @@ typedef enum
 	DIRECTORY
 }FSElementType;
 
+typedef enum
+{
+	LIST_ITEM,
+	BUTTON,
+	NONE
+}UIElementType;
+
 //Structure used to store a path to a file
 typedef struct{
 	int8_t *PathString;
-	int8_t Type;
+	FSElementType Type;
 } FSElement;
 
 //User structures & global variables
@@ -112,6 +119,7 @@ typedef struct screen_element_s screen_element_s;
 struct screen_element_s{
 	uint8_t *ElementName;
 	void* specificParameter;
+	UIElementType ElementType;
 	float Xorigin;
 	float Yorigin;
 	screen_element_s* neighbors[4];
@@ -122,7 +130,7 @@ struct screen_element_s{
 };
 
 extern const command_s CommandList[];
-extern const screen_element_s ScreenElementList[];
+extern screen_element_s ScreenElementList[];
 
 //User functions prototypes
 

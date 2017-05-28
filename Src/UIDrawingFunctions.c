@@ -30,22 +30,30 @@ void UserInterfaceInit(void){
 	//Room is provided for 30 files, for more, dynamic allocation has to be implemented
 	//This program will crash if more than 30 files are in the folder
 	//TODO: modify ls function to allow dynamic allocation
-/*	FSElement FileList [30] = {{"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", 3}};
+	FSElement FileList [30];
 
-	osMutexWait(FSMutexHandle, osWaitForever);
 	//Find ls command
-	command_s* Ls_command_p = GetCommandByName((int8_t*)"ls");
-	//Execute it with zero argument and FileList to populate
-	Ls_command_p->Function_p(0, (uint8_t**){"silent"}, (void*)FileList);
+	const command_s* Ls_command_p = GetCommandByName((int8_t*)"ls");
+
+	//Execute it with silent argument and FileList to populate
+	//No need for mutex since the ls function already contains a mutex
+	Ls_command_p->Function_p(1, (uint8_t*[]){(uint8_t*)"silent"}, (void*)&FileList);
 
 	//Debug output for filelist
 	int j = 0;
 	while(FileList[j].PathString != NULL){
-		WriteConsole(FileList[j].PathString);
-	}*/
+		WriteConsole((uint8_t*)FileList[j].PathString);
+		WriteConsole((uint8_t*)"\n");
+		j++;
+	}
 
 	while(ScreenElementList[i].ElementName != NULL){
-		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, "test filename");
+		//Update specific parameter which is a POINTER on void
+		if(ScreenElementList[i].ElementType == LIST_ITEM){
+			ScreenElementList[i].specificParameter = (void*)&(FileList[i]);
+		}
+
+		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, ((FSElement*)(ScreenElementList[i].specificParameter))->PathString);
 		i++;
 	}
 	ScreenElementList[0].ElementDrawSelectedFunction_p(ScreenElementList[0].Xorigin, ScreenElementList[0].Yorigin);

@@ -665,7 +665,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 		//Buffer to store long file names
 		static TCHAR LongFileNameBuffer[_MAX_LFN];
 		//Cursor used to populate the output structure
-		int fileStructureCursor = 0;
+		int8_t fileStructureCursor = 0;
 		int8_t silentMode = 0;
 
 		//Detecting silent mode
@@ -722,17 +722,19 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				sprintf((char*)stringDump, "| "CYN"Dir"RESET"  |" CYN " %s\n" RESET, (char*)tempFname);
 				if(!silentMode) WriteConsole((uint8_t*)stringDump);
 
-				//Populating the output structure
-				//strcpy(((FSElement*)out)[fileStructureCursor].PathString, tempFname);
-				//((FSElement*)out)[fileStructureCursor].Type = 2;
+				//Populating the output structure. out is a pointer to an array of structures of type FSElement
+				((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname));
+				strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+				((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
 
 			} else {                                        /*It is a file.*/
 				sprintf((char*)stringDump, "| "YEL"File"RESET" | %s", (char*)tempFname);
 				if(!silentMode) WriteConsole((uint8_t*)stringDump);
 
-				//Populating the output structure
-				//strcpy(((FSElement*)out)[fileStructureCursor].PathString, tempFname);
-				//((FSElement*)out)[fileStructureCursor].Type = 1;
+				//Populating the output structure. out is a pointer to an array of structures of type FSElement
+				((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname));
+				strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+				((FSElement*)out)[fileStructureCursor].Type = SINGLE_FILE;
 			}
 
 			if(fno.fsize){
@@ -743,6 +745,8 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 		}
 		f_closedir(&dir);
+		//NULL-terminating the structure
+		((FSElement*)out)[fileStructureCursor].PathString = NULL;
 		osMutexRelease(FSMutexHandle);
 		return 1;
 

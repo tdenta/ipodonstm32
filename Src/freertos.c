@@ -124,8 +124,7 @@ void MX_FREERTOS_Init(void) {
 
   osMutexDef(FSMutex);
   FSMutexHandle = osMutexCreate(osMutex(FSMutex));
-
-  osMutexWait(FSMutexHandle, osWaitForever);//Start with nothing to prevent threads to access FS before proper mounting
+  osMutexWait(FSMutexHandle, osWaitForever);//Start with nothing to prevent threads from accessing filesystem before mounted
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */
