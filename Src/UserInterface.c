@@ -22,10 +22,9 @@ screen_element_s ScreenElementList[] = {
 				LIST_ITEM,
 				0.0,
 				0.1,
-				{NULL, NULL, NULL,NULL},
+				{NULL, NULL, &(ScreenElementList[1]),NULL},
 				&DrawFileLine,
-				&DrawFileSelection,
-				NULL,
+				&ProcessFileLine,
 				NULL
 		},
 		{(uint8_t*)"FileLine2",
@@ -33,9 +32,9 @@ screen_element_s ScreenElementList[] = {
 				LIST_ITEM,
 				0.0,
 				0.2,
-				{NULL, NULL, NULL,NULL},
+				{NULL, &(ScreenElementList[0]), &(ScreenElementList[2]),NULL},
 				&DrawFileLine,
-				NULL,
+				&ProcessFileLine,
 				NULL,
 				NULL
 		},
@@ -44,9 +43,9 @@ screen_element_s ScreenElementList[] = {
 				LIST_ITEM,
 				0.0,
 				0.3,
-				{NULL, NULL, NULL,NULL},
+				{NULL, &(ScreenElementList[1]), &(ScreenElementList[3]),NULL},
 				&DrawFileLine,
-				NULL,
+				&ProcessFileLine,
 				NULL,
 				NULL
 		},
@@ -55,9 +54,9 @@ screen_element_s ScreenElementList[] = {
 				LIST_ITEM,
 				0.0,
 				0.4,
-				{NULL, NULL, NULL,NULL},
+				{NULL, &(ScreenElementList[2]), &(ScreenElementList[4]),NULL},
 				&DrawFileLine,
-				NULL,
+				&ProcessFileLine,
 				NULL,
 				NULL
 		},
@@ -66,9 +65,9 @@ screen_element_s ScreenElementList[] = {
 				LIST_ITEM,
 				0.0,
 				0.5,
-				{NULL, NULL, NULL,NULL},
+				{NULL, &(ScreenElementList[3]), &(ScreenElementList[5]),NULL},
 				&DrawFileLine,
-				NULL,
+				&ProcessFileLine,
 				NULL,
 				NULL
 		},
@@ -77,9 +76,9 @@ screen_element_s ScreenElementList[] = {
 				LIST_ITEM,
 				0.0,
 				0.6,
-				{NULL, NULL, NULL,NULL},
+				{NULL, &(ScreenElementList[4]), &(ScreenElementList[6]),NULL},
 				&DrawFileLine,
-				NULL,
+				&ProcessFileLine,
 				NULL,
 				NULL
 		},
@@ -88,9 +87,9 @@ screen_element_s ScreenElementList[] = {
 				LIST_ITEM,
 				0.0,
 				0.7,
-				{NULL, NULL, NULL,NULL},
+				{NULL, &(ScreenElementList[5]), NULL,NULL},
 				&DrawFileLine,
-				NULL,
+				&ProcessFileLine,
 				NULL,
 				NULL
 		},
@@ -118,8 +117,10 @@ screen_element_s ScreenElementList[] = {
 		}
 };
 
+screen_element_s* currentlySelectedElement;
 
-int16_t joy;
+JoystickDirection joystickPosition;
+
 osEvent event;
 //joyId[5] = {"Left","Up","Down","Right","Center"};
 int i = 0;
@@ -132,12 +133,16 @@ void UserInterface(void const * argument){
 	UserInterfaceInit();
 
 	  while(1){
-		  osDelay(20);
 		  event = osMessageGet(ButtonQueueHandle, osWaitForever);
 	      if (event.status == osEventMessage)
 	      {
-	    	  joy = event.value.v;
+	    	  joystickPosition = event.value.v;
 	      }
+
+	      sprintf((char*)stringDump, "Joystick event detected: %d\n", (int)joystickPosition);
+	      WriteConsole((uint8_t*)stringDump);
+
+	      currentlySelectedElement->ElementFunction_p(joystickPosition);
 
 	  }
 }

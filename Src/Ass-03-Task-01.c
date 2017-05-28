@@ -49,14 +49,16 @@ void Ass_03_Task_01(void const * argument)
     s[4]=HAL_GPIO_ReadPin(GPIOC, JOY_CTR_Pin);
     for (i=0;i<5;i++)
     {
+    	//If there is a set
       if (s[i] != p[i])
       {
-    	  osMessagePut(ButtonQueueHandle, i, 0);
         if (s[i] == GPIO_PIN_SET)
         {
            osMutexWait(LCDMutexHandle, osWaitForever);
 	   //BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"SET  ",LEFT_MODE);
 	   osMutexRelease(LCDMutexHandle);
+	   //Send message to UI task
+	   osMessagePut(ButtonQueueHandle, i, 0);
         }
         else
         {
@@ -64,7 +66,6 @@ void Ass_03_Task_01(void const * argument)
   	   //BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"RESET",LEFT_MODE);
     	   osMutexRelease(LCDMutexHandle);
   	  // STEPIEN: Send message to Task 2
-  	  osMessagePut (myQueue01Handle, (uint32_t)i, 0);
         }
         p[i]=s[i];
       }

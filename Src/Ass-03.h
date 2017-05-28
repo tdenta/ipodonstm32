@@ -87,6 +87,14 @@ extern void ReadConsole(uint8_t *c);
 #define LCD_MODE LEFT_MODE
 
 typedef enum{
+	LEFT = 0,
+	UP = 1,
+	DOWN = 2,
+	RIGHT = 3,
+	CENTER = 4,
+}JoystickDirection;
+
+typedef enum{
 	SINGLE_FILE,
 	DIRECTORY
 }FSElementType;
@@ -105,7 +113,7 @@ typedef enum
 
 //Structure used to store a path to a file
 typedef struct{
-	int8_t *PathString;
+	uint8_t *PathString;
 	FSElementType Type;
 } FSElement;
 
@@ -130,11 +138,17 @@ struct screen_element_s{
 	void (*ElementDrawFunction_p)(float X, float Y, SelectionMode Mode, void* parameter);
 	//void (*ElementDrawSelectedFunction_p)(float X, float Y);
 	//void (*ElementResetSelectionFunction_p)(float X, float Y);
-	void (*ElementFunction_p)(int8_t JoystickAction);
+	void (*ElementFunction_p)(JoystickDirection JoystickAction);
 };
 
 extern const command_s CommandList[];
 extern screen_element_s ScreenElementList[];
+extern screen_element_s* currentlySelectedElement;
+extern FSElement FileList [30];
+extern screen_element_s* upperNeighbor;
+extern screen_element_s* lowerNeighbor;
+extern screen_element_s* rightNeighbor;
+extern screen_element_s* leftNeighbor;
 
 //User functions prototypes
 
@@ -193,9 +207,12 @@ extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
 
 void UserInterfaceInit(void);
 
-void DrawFileLine(float X, float Y, void* filename, void* ButtonIsSelected);
-void DrawPlayPauseButton(float X, float Y, void* ButtonIsSelected);
+extern void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename);
+extern void DrawPlayPauseButton(float X, float Y, SelectionMode Mode, void* arg);
 //void DrawFileSelection(float X, float Y);
 
+//UI Processing Functions
+
+extern void ProcessFileLine(JoystickDirection joystickAction);
 
 #endif /* ASS_03_H_ */
