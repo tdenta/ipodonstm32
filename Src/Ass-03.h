@@ -193,8 +193,12 @@ extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
 
 void UserInterfaceInit(void);
 
-void DrawFileLine(float X, float Y, void* filename, void* ButtonIsSelected);
-void DrawPlayPauseButton(float X, float Y, void* ButtonIsSelected);
+void DrawFileLine(float X, float Y, SelectionMode Mode,void* filename);
+void DrawPlayPauseButton(float X, float Y, SelectionMode Mode,void* arg);
+void DrawStopButton(float X, float Y, SelectionMode Mode,void* arg);
+void DrawCurrentTimeMin(float X, float Y, SelectionMode Mode, void* CurrentTime);
+void DrawCurrentTimeTensOfSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeTensOfSeconds);
+void DrawCurrentTimeSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeSeconds);
 //void DrawFileSelection(float X, float Y);
 
 

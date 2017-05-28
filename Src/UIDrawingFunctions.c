@@ -26,6 +26,7 @@ void UserInterfaceInit(void){
 	LCDYSize = BSP_LCD_GetYSize();
 
 	int i = 0;
+	SelectionMode Mode = REGULAR;
 
 	//Room is provided for 30 files, for more, dynamic allocation has to be implemented
 	//This program will crash if more than 30 files are in the folder
@@ -33,27 +34,29 @@ void UserInterfaceInit(void){
 	FSElement FileList [30];
 
 	//Find ls command
-	const command_s* Ls_command_p = GetCommandByName((int8_t*)"ls");
+	/*const command_s* Ls_command_p = GetCommandByName((int8_t*)"ls");*/
 
 	//Execute it with silent argument and FileList to populate
 	//No need for mutex since the ls function already contains a mutex
-	Ls_command_p->Function_p(1, (uint8_t*[]){(uint8_t*)"silent"}, (void*)&FileList);
+	/*Ls_command_p->Function_p(1, (uint8_t*[]){(uint8_t*)"silent"}, (void*)&FileList);*/
 
 	//Debug output for filelist
-	int j = 0;
+/*	int j = 0;
 	while(FileList[j].PathString != NULL){
 		WriteConsole((uint8_t*)FileList[j].PathString);
 		WriteConsole((uint8_t*)"\n");
 		j++;
 	}
+*/
+	char* words[] = {"File1", "File2", "File3", "File4", "File5", "File6", "File7","Play", "Stop", "3:", "5", "1"};
 
 	while(ScreenElementList[i].ElementName != NULL){
 		//Update specific parameter which is a POINTER on void
-		if(ScreenElementList[i].ElementType == LIST_ITEM){
+		/*if(ScreenElementList[i].ElementType == LIST_ITEM){
 			ScreenElementList[i].specificParameter = (void*)&(FileList[i]);
-		}
+		}*/
 
-		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, ((FSElement*)(ScreenElementList[i].specificParameter))->PathString);
+		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, Mode, words[i]/*((FSElement*)(ScreenElementList[i].specificParameter))->PathString*/);
 		i++;
 	}
 
@@ -96,23 +99,20 @@ void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename){
 	osMutexRelease(LCDMutexHandle);
 }
 
-void DrawPlayPauseButton(float X, float Y, void* arg){
-
-	if(){
-
-	}
+void DrawPlayPauseButton(float X, float Y, SelectionMode Mode, void* arg){
 
 	//Relative width and height of the screen element
 	float width = 0.2;
 	float height = 0.2;
 
-	osMutexWait(LCDMutexHandle, osWaitForever);
-
-	BSP_LCD_SetTextColor(LCD_COLOR_RED);
-
 	//Calculating all the important sizes in absolute pixel numbers (need the LCD sizes)
 	uint16_t absoluteXorigin = (uint16_t)((float)LCDXSize*X);
 	uint16_t absoluteYorigin = (uint16_t)((float)LCDYSize*Y);
+
+
+	osMutexWait(LCDMutexHandle, osWaitForever);
+
+	BSP_LCD_SetTextColor(Mode);
 
 	//Drawing the rectangle that represents the button
 	BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, (uint16_t)(width*(float)LCDXSize),(uint16_t)(height*(float)LCDYSize));
@@ -163,17 +163,82 @@ void DrawPlayPauseButton(float X, float Y, void* arg){
 	osMutexRelease(LCDMutexHandle);
 }
 
-void DrawFileSelection(float X, float Y){
+void DrawStopButton(float X, float Y, SelectionMode Mode, void* arg){
 
-	// %'s to be replaced with input
-	uint16_t width = 0.7*((float)LCDXSize);
-	uint16_t height = 0.1*((float)LCDYSize);
+	//Relative width and height of the screen element
+	float width = 0.2;
+	float height = 0.2;
+
+	uint16_t absoluteXorigin = (uint16_t)((float)LCDXSize*X);
+	uint16_t absoluteYorigin = (uint16_t)((float)LCDYSize*Y);
+
+	//Calculating the absolute position of the triangle center on the screen given the button position and the dimensions of the triangle relative to the button
+	uint16_t absoluteButtonXcenter =(uint16_t)((width/2)*(float)LCDXSize) + absoluteXorigin;
+	uint16_t absoluteButtonYcenter =(uint16_t)((height/2)*(float)LCDYSize) + absoluteYorigin;
+
+	//Stop button width based on button size
+	uint16_t StopSideLength = 0.5*width*(float)LCDYSize;
+
+	//Offsets
+	uint16_t stopOffset = StopSideLength/2;
 
 	osMutexWait(LCDMutexHandle, osWaitForever);
 
-	BSP_LCD_SetTextColor(LCD_COLOR_LIGHTBLUE);
-	BSP_LCD_DrawRect((uint16_t)(X*(float)LCDXSize), (uint16_t)(Y*(float)LCDYSize) ,width , height);
-	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+	//BSP_LCD_SetTextColor(LCD_COLOR_LIGHTGRAY); //Colour for box fill
+	//BSP_LCD_FillRect(absoluteXorigin, absoluteYorigin, (uint16_t)(width*(float)LCDXSize),(uint16_t)(height*(float)LCDYSize));
+	BSP_LCD_SetTextColor(LCD_COLOR_RED);
+	BSP_LCD_FillRect((absoluteButtonXcenter - stopOffset), (absoluteButtonYcenter - stopOffset) ,StopSideLength, StopSideLength);
+
+	BSP_LCD_SetTextColor(Mode); //Colour for borders
+	BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, (uint16_t)(width*(float)LCDXSize),(uint16_t)(height*(float)LCDYSize)); //Drawing the rectangle that represents the button
+	BSP_LCD_DrawRect((absoluteButtonXcenter - stopOffset), (absoluteButtonYcenter - stopOffset) ,StopSideLength, StopSideLength); //Draw stop symbol
 
 	osMutexRelease(LCDMutexHandle);
 }
+
+void DrawCurrentTimeMin(float X, float Y, SelectionMode Mode, void* CurrentTimeMin){
+
+	osMutexWait(LCDMutexHandle, osWaitForever);
+
+	BSP_LCD_SetFont(&Font16);
+	BSP_LCD_DisplayStringAt(X*(float)LCDXSize, Y*(float)LCDYSize, (uint8_t*)CurrentTimeMin, LEFT_MODE);
+	BSP_LCD_SetFont(&Font12);
+
+	osMutexRelease(LCDMutexHandle);
+}
+void DrawCurrentTimeTensOfSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeTensOfSeconds){
+
+	osMutexWait(LCDMutexHandle, osWaitForever);
+
+	BSP_LCD_SetFont(&Font16);
+	BSP_LCD_DisplayStringAt(X*(float)LCDXSize, Y*(float)LCDYSize, (uint8_t*)CurrentTimeTensOfSeconds, LEFT_MODE);
+	BSP_LCD_SetFont(&Font12);
+
+	osMutexRelease(LCDMutexHandle);
+
+}
+void DrawCurrentTimeSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeSeconds){
+
+	osMutexWait(LCDMutexHandle, osWaitForever);
+
+	BSP_LCD_SetFont(&Font16);
+	BSP_LCD_DisplayStringAt(X*(float)LCDXSize, Y*(float)LCDYSize, (uint8_t*)CurrentTimeSeconds, LEFT_MODE);
+	BSP_LCD_SetFont(&Font12);
+
+	osMutexRelease(LCDMutexHandle);
+
+}
+//void DrawFileSelection(float X, float Y){
+//
+//	// %'s to be replaced with input
+//	uint16_t width = 0.7*((float)LCDXSize);
+//	uint16_t height = 0.1*((float)LCDYSize);
+//
+//	osMutexWait(LCDMutexHandle, osWaitForever);
+//
+//	BSP_LCD_SetTextColor(LCD_COLOR_LIGHTBLUE);
+//	BSP_LCD_DrawRect((uint16_t)(X*(float)LCDXSize), (uint16_t)(Y*(float)LCDYSize) ,width , height);
+//	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+//
+//	osMutexRelease(LCDMutexHandle);
+//}
