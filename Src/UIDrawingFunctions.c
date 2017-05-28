@@ -45,14 +45,13 @@ void UserInterfaceInit(void){
 	}*/
 
 	while(ScreenElementList[i].ElementName != NULL){
-		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, "test filename");
+		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, "test filename",0);
 		i++;
 	}
-	ScreenElementList[0].ElementDrawSelectedFunction_p(ScreenElementList[0].Xorigin, ScreenElementList[0].Yorigin);
 
 }
 
-void DrawFileLine(float X, float Y, void* filename){
+void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename){
 
 	//Saving the previous font used in order to set it back after drawing is finished
 	sFONT* previousFont = BSP_LCD_GetFont();
@@ -62,6 +61,9 @@ void DrawFileLine(float X, float Y, void* filename){
 	float height = 0.1;
 
 	osMutexWait(LCDMutexHandle, osWaitForever);
+
+	BSP_LCD_SetTextColor(Mode);
+
 	//Setting a new font
 	BSP_LCD_SetFont(&Font12);
 
@@ -87,6 +89,10 @@ void DrawFileLine(float X, float Y, void* filename){
 }
 
 void DrawPlayPauseButton(float X, float Y, void* arg){
+
+	if(){
+
+	}
 
 	//Relative width and height of the screen element
 	float width = 0.2;

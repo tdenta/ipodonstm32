@@ -86,11 +86,15 @@ extern void ReadConsole(uint8_t *c);
 #define FILE_BUFFER_SIZE 4
 #define LCD_MODE LEFT_MODE
 
-typedef enum
-{
+typedef enum{
 	SINGLE_FILE,
 	DIRECTORY
 }FSElementType;
+
+typedef enum{
+	SELECTED =  LCD_COLOR_BLUE,	 //Light blue
+	REGULAR = LCD_COLOR_BLACK		//Black
+}SelectionMode;
 
 //Structure used to store a path to a file
 typedef struct{
@@ -115,9 +119,9 @@ struct screen_element_s{
 	float Xorigin;
 	float Yorigin;
 	screen_element_s* neighbors[4];
-	void (*ElementDrawFunction_p)(float X, float Y, void* parameter);
-	void (*ElementDrawSelectedFunction_p)(float X, float Y);
-	void (*ElementResetSelectionFunction_p)(float X, float Y);
+	void (*ElementDrawFunction_p)(float X, float Y, SelectionMode Mode, void* parameter);
+	//void (*ElementDrawSelectedFunction_p)(float X, float Y);
+	//void (*ElementResetSelectionFunction_p)(float X, float Y);
 	void (*ElementFunction_p)(int8_t JoystickAction);
 };
 
@@ -181,9 +185,9 @@ extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
 
 void UserInterfaceInit(void);
 
-void DrawFileLine(float X, float Y, void* filename);
-void DrawPlayPauseButton(float X, float Y, void* arg);
-void DrawFileSelection(float X, float Y);
+void DrawFileLine(float X, float Y, void* filename, void* ButtonIsSelected);
+void DrawPlayPauseButton(float X, float Y, void* ButtonIsSelected);
+//void DrawFileSelection(float X, float Y);
 
 
 #endif /* ASS_03_H_ */
