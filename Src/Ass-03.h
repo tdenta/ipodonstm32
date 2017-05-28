@@ -36,7 +36,7 @@ extern osThreadId audioManagerTaskHandle;
 
 extern osSemaphoreId myBinarySem01Handle;
 extern osMessageQId myQueue01Handle;
-extern osMutexId myMutex01Handle;
+extern osMutexId LCDMutexHandle;
 
 //User OS Handles
 extern osMutexId audioBufferMutexHandle;
@@ -83,6 +83,7 @@ extern void ReadConsole(uint8_t *c);
 #define SAMPLE_FREQ 8000
 #define PATH_BUFFER_SIZE 300
 #define FILE_BUFFER_SIZE 4
+#define LCD_MODE LEFT_MODE
 
 //User structures & global variables
 typedef struct{
@@ -94,15 +95,20 @@ typedef struct{
 	int8_t *HelpString;						//The help message for the function
 } command_s;
 
-typedef struct{
-	int8_t *ButtonName;
-	int8_t (*ButtonFunction_p)(
-			uint8_t *s,
-			uint8_t *CurrentButton[]);
-}ButtonFuncs;
+typedef struct screen_element_s screen_element_s;
+struct screen_element_s{
+	uint8_t *ElementName;
+	float Xorigin;
+	float Yorigin;
+	screen_element_s* neighbors[4];
+	void (*ElementDrawFunction_p)(float X, float Y, void* parameter);
+	void (*ElementDrawSelectedFunction_p)(float X, float Y);
+	void (*ElementResetSelectionFunction_p)(float X, float Y);
+	void (*ElementFunction_p)(int8_t JoystickAction);
+};
 
-extern const ButtonFuncs ButtonList[];
 extern const command_s CommandList[];
+extern const screen_element_s ScreenElementList[];
 
 //User functions prototypes
 
@@ -130,7 +136,10 @@ extern const uint8_t* fsErrors[];
 
 //Variables used in the copy function
 extern FIL fsrc, fdst;      /* File objects */
-//extern BYTE cpbuffer[FILE_BUFFER_SIZE];   /* File copy buffer */
+
+//UI drawing variables
+uint32_t LCDXSize;
+uint32_t LCDYSize;
 
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
@@ -153,6 +162,13 @@ extern int8_t BackFunction(uint8_t *s, uint8_t *CurrentButton[]);
 extern int8_t FwdFunction(uint8_t *s, uint8_t *CurrentButton[]);
 extern int8_t PlaySlctFunction(uint8_t *s, uint8_t *CurrentButton[]);
 extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
+
+//UI drawing functions
+
+void UserInterfaceInit(void);
+
+void DrawFileLine(float X, float Y, void* filename);
+void DrawPlayPauseButton(float X, float Y, void* arg);
 
 
 #endif /* ASS_03_H_ */

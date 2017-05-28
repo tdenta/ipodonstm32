@@ -19,12 +19,12 @@ void Ass_03_Task_01(void const * argument)
   uint8_t ts[100];
 
 
-  // Initialize and turn on LCD and calibrate the touch panel (needs to be done first)
+  /*// Initialize and turn on LCD and calibrate the touch panel (needs to be done first)
   BSP_LCD_Init();
   BSP_LCD_DisplayOn();
 
   // Set buttons
-  osMutexWait(myMutex01Handle, osWaitForever);
+  osMutexWait(LCDMutexHandle, osWaitForever);
   BSP_LCD_Clear(LCD_COLOR_WHITE);
   BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
   BSP_LCD_DrawVLine(  160, 2,  235);
@@ -36,10 +36,7 @@ void Ass_03_Task_01(void const * argument)
   BSP_LCD_DisplayStringAt(195,160, (uint8_t*)"SELECT",LEFT_MODE);
   BSP_LCD_DisplayStringAt(184,185, (uint8_t*)"PLAYLIST",LEFT_MODE);
   BSP_LCD_SetFont(&Font12);
-//
-//
-//
-  osMutexRelease(myMutex01Handle);
+  osMutexRelease(LCDMutexHandle);*/
 
   //WriteConsole((uint8_t *)"Hello from Task 1\n");
 
@@ -57,24 +54,24 @@ void Ass_03_Task_01(void const * argument)
     	  osMessagePut(ButtonQueueHandle, i, 0);
         if (s[i] == GPIO_PIN_SET)
         {
-           osMutexWait(myMutex01Handle, osWaitForever);
-	   BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"SET  ",LEFT_MODE);
-	   osMutexRelease(myMutex01Handle);
+           osMutexWait(LCDMutexHandle, osWaitForever);
+	   //BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"SET  ",LEFT_MODE);
+	   osMutexRelease(LCDMutexHandle);
         }
         else
         {
-           osMutexWait(myMutex01Handle, osWaitForever);
-  	   BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"RESET",LEFT_MODE);
-    	   osMutexRelease(myMutex01Handle);
+           osMutexWait(LCDMutexHandle, osWaitForever);
+  	   //BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"RESET",LEFT_MODE);
+    	   osMutexRelease(LCDMutexHandle);
   	  // STEPIEN: Send message to Task 2
   	  osMessagePut (myQueue01Handle, (uint32_t)i, 0);
         }
         p[i]=s[i];
       }
       sprintf((char*)ts,"Task 1: %d",(int)loop);
-      osMutexWait(myMutex01Handle, osWaitForever);
+      osMutexWait(LCDMutexHandle, osWaitForever);
       //BSP_LCD_DisplayStringAt(5,190, ts, LEFT_MODE);
-      osMutexRelease(myMutex01Handle);
+      osMutexRelease(LCDMutexHandle);
       loop++;
       // STEPIEN: Signal received from timer
       osSignalWait(1,osWaitForever);

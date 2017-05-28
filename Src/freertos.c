@@ -61,7 +61,7 @@ osThreadId UserInterfaceTaskHandle;
 osMessageQId myQueue01Handle;
 osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
-osMutexId myMutex01Handle;
+osMutexId LCDMutexHandle;
 
 osSemaphoreId myBinarySem01Handle;
 osSemaphoreId myCountingSem01Handle;
@@ -107,8 +107,8 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the mutex(es) */
   /* definition and creation of myMutex01 */
-  osMutexDef(myMutex01);
-  myMutex01Handle = osMutexCreate(osMutex(myMutex01));
+  osMutexDef(LCDMutex);
+  LCDMutexHandle = osMutexCreate(osMutex(LCDMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
 
