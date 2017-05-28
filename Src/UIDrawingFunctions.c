@@ -31,6 +31,7 @@ void UserInterfaceInit(void){
 		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, "test filename");
 		i++;
 	}
+	ScreenElementList[0].ElementDrawSelectedFunction_p(ScreenElementList[0].Xorigin, ScreenElementList[0].Yorigin);
 
 }
 
@@ -88,29 +89,58 @@ void DrawPlayPauseButton(float X, float Y, void* arg){
 	float triangleXDimension = (0.666666)*triangleYDimension;
 
 	//Calculating the absolute position of the triangle center on the screen given the button position and the dimensions of the triangle relative to the button
-	uint16_t absoluteTriangleXcenter =(uint16_t)((width/2)*(float)LCDXSize) + absoluteXorigin;
-	uint16_t absoluteTriangleYcenter =(uint16_t)((height/2)*(float)LCDYSize) + absoluteYorigin;
+	uint16_t absoluteButtonXcenter =(uint16_t)((width/2)*(float)LCDXSize) + absoluteXorigin;
+	uint16_t absoluteButtonYcenter =(uint16_t)((height/2)*(float)LCDYSize) + absoluteYorigin;
 
 	//Defining the three edges of the triangle in absolute position, following the previous instructions
 	Point P1 = {
-			(uint16_t)((float)absoluteTriangleXcenter - (triangleXDimension/2)*width*(float)LCDXSize),
-			(uint16_t)((float)absoluteTriangleYcenter - (triangleYDimension/2)*height*(float)LCDYSize)
+			(uint16_t)((float)absoluteButtonXcenter - (triangleXDimension/2)*width*(float)LCDXSize),
+			(uint16_t)((float)absoluteButtonYcenter - (triangleYDimension/2)*height*(float)LCDYSize)
 	};
 
 	Point P2 = {
-			(uint16_t)((float)absoluteTriangleXcenter + (triangleXDimension/2)*width*(float)LCDXSize),
-			(uint16_t)((float)absoluteTriangleYcenter)
+			(uint16_t)((float)absoluteButtonXcenter + (triangleXDimension/2)*width*(float)LCDXSize),
+			(uint16_t)((float)absoluteButtonYcenter)
 	};
 
 	Point P3 = {
-			(uint16_t)((float)absoluteTriangleXcenter - (triangleXDimension/2)*width*(float)LCDXSize),
-			(uint16_t)((float)absoluteTriangleYcenter + (triangleYDimension/2)*height*(float)LCDYSize)
+			(uint16_t)((float)absoluteButtonXcenter - (triangleXDimension/2)*width*(float)LCDXSize),
+			(uint16_t)((float)absoluteButtonYcenter + (triangleYDimension/2)*height*(float)LCDYSize)
 	};
 
 	Point TrianglePoints[] = {P1, P2, P3};
 
 	//Drawing the triangle
 	BSP_LCD_DrawPolygon(TrianglePoints, (uint16_t) 3);
+
+	//Draw the pause button -Will need to be conditional
+	uint16_t pauseWidth = 0.1*width*(float)LCDXSize;
+	uint16_t pauseHeight = 0.5*height*(float)LCDYSize;
+
+	//Offsets
+	uint16_t pauseYOffset = pauseHeight/2;
+	uint16_t pauseXOffsetL = 1.5*pauseWidth;
+	uint16_t pauseXOffsetR = 0.5*pauseWidth;
+
+
+	//Print to LCD
+	BSP_LCD_DrawRect((absoluteButtonXcenter - pauseXOffsetL), (absoluteButtonYcenter - pauseYOffset) ,pauseWidth, pauseHeight);
+	BSP_LCD_DrawRect((absoluteButtonXcenter + pauseXOffsetR), (absoluteButtonYcenter - pauseYOffset) ,pauseWidth, pauseHeight);
+
+	osMutexRelease(LCDMutexHandle);
+}
+
+void DrawFileSelection(float X, float Y){
+
+	// %'s to be replaced with input
+	uint16_t width = 0.7*((float)LCDXSize);
+	uint16_t height = 0.1*((float)LCDYSize);
+
+	osMutexWait(LCDMutexHandle, osWaitForever);
+
+	BSP_LCD_SetTextColor(LCD_COLOR_LIGHTBLUE);
+	BSP_LCD_DrawRect((uint16_t)(X*(float)LCDXSize), (uint16_t)(Y*(float)LCDYSize) ,width , height);
+	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 
 	osMutexRelease(LCDMutexHandle);
 }

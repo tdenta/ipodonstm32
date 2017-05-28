@@ -22,7 +22,7 @@ const screen_element_s ScreenElementList[] = {
 				0.1,
 				{NULL, NULL, NULL,NULL},
 				&DrawFileLine,
-				NULL,
+				&DrawFileSelection,
 				NULL,
 				NULL
 		},
