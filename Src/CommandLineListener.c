@@ -38,17 +38,12 @@ void CommandLineListener(void const * argument)
 		//Print back the character being read
 		char prt1[2];
 
-		if ((BufferCursor == 0) && (c == 0x7f))
-		{
-
-		}
-		else
+		//0x7f is backspace
+		if ((BufferCursor != 0) || (c != 0x7f))
 		{
 			sprintf(prt1,"%c",c);
 			WriteConsole((uint8_t *)prt1);
 		}
-
-
 
 		if(BufferCursor == BUFFER_MAX_SIZE-1){//In case of buffer overflow we cannot get the entire command typed
 
