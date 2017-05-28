@@ -324,6 +324,9 @@ int8_t IsFloatNumber(uint8_t* string){
  *Returns 1 if success, 0 otherwise
  */
 int8_t SDCardInit(void){
+
+	//No need to wait for mutex as this function is the first to access filesystem and mutex has been taken in freertos.c
+
 	//Checking if the SD card itself is available
 	if(retSD!=0){
 		WriteConsole((uint8_t *)RED"ERROR: SD card not inserted."RESET);
@@ -344,6 +347,8 @@ int8_t SDCardInit(void){
 
 		//Update the path global variable for displaying purposes
 		strcpy((char*)pathOfCurrentWorkingDirectory, (char*)"/");
+
+		osMutexRelease(FSMutexHandle);
 
 		return 1;
 	}

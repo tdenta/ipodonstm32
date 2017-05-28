@@ -27,6 +27,23 @@ void UserInterfaceInit(void){
 
 	int i = 0;
 
+	//Room is provided for 30 files, for more, dynamic allocation has to be implemented
+	//This program will crash if more than 30 files are in the folder
+	//TODO: modify ls function to allow dynamic allocation
+/*	FSElement FileList [30] = {{"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", 3}};
+
+	osMutexWait(FSMutexHandle, osWaitForever);
+	//Find ls command
+	command_s* Ls_command_p = GetCommandByName((int8_t*)"ls");
+	//Execute it with zero argument and FileList to populate
+	Ls_command_p->Function_p(0, (uint8_t**){"silent"}, (void*)FileList);
+
+	//Debug output for filelist
+	int j = 0;
+	while(FileList[j].PathString != NULL){
+		WriteConsole(FileList[j].PathString);
+	}*/
+
 	while(ScreenElementList[i].ElementName != NULL){
 		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, "test filename");
 		i++;
@@ -75,6 +92,8 @@ void DrawPlayPauseButton(float X, float Y, void* arg){
 	float height = 0.2;
 
 	osMutexWait(LCDMutexHandle, osWaitForever);
+
+	BSP_LCD_SetTextColor(LCD_COLOR_RED);
 
 	//Calculating all the important sizes in absolute pixel numbers (need the LCD sizes)
 	uint16_t absoluteXorigin = (uint16_t)((float)LCDXSize*X);

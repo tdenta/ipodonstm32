@@ -25,7 +25,7 @@ int16_t audioBuffer02[AUDIO_BUFFER_SIZE] = {0};
  * Returns 1 if successful, 0 otherwise
  * Returns the result as floating point in the out variable
  */
-int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 	//Function works only with two arguments
 	if(ArgNum == 2){
@@ -50,7 +50,7 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			int16_t result = digit1 - digit2;
 
 			//Returning the result of the function inside an external integer
-			*out = result;
+			//*out = result;
 
 			//PRINT TO CONSOLE
 			sprintf((char*)stringDump, "%d - %d = %d \n", (int)digit1, (int)digit2, (int)result);
@@ -72,7 +72,7 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			sscanf((char*)ArgStrings[1], "%f", &digit2);
 
 			float result = digit1 - digit2;
-			*out = result;
+			//*out = result;
 
 			//PRINT TO CONSOLE
 			sprintf((char*)stringDump, "%f - %f = %f \n", digit1, digit2, result);
@@ -109,7 +109,7 @@ int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
  * Turns debug mode on and off, and prints a confirmation message
  * Returns 1 if successful, 0 otherwise
  */
-int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 	//Function works only with 1 argument
 	if(ArgNum == 1){
@@ -167,7 +167,7 @@ int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
  * Displays help message corresponding to a specific command
  * Returns 1 if successful, 0 otherwise
  */
-int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 	//Function works only with 1 argument
 	if(ArgNum == 1){
@@ -207,7 +207,7 @@ int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
  * Prints the result of the addition of several integers or floating point numbers
  * Returns 1 if successful, 0 otherwise
  */
-int8_t AddFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t AddFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	float result = 0;
 
 	//digit stands for the current argument being processed
@@ -232,7 +232,7 @@ int8_t AddFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	if(IsFloat){
 		//Return result
 		printf("%f\n", result);
-		*out = result;
+		//*out = result;
 		return 1;
 	}else{
 		printf(RED "Arguments are not numbers.\nUsage: help add\n" RESET);
@@ -248,7 +248,7 @@ int8_t AddFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
  * Prints the result of a division between two integers or two floating point numbers
  * Returns 1 if successful, 0 otherwise
  */
-int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 	//Function works only with two arguments
 	if(ArgNum == 2){
@@ -268,7 +268,7 @@ int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 			sscanf((char*)ArgStrings[1], "%f", &digit2);
 
 			float result = digit1 / digit2;
-			*out = result;
+			//*out = result;
 
 			printf("%f %% %f = %f \n", digit1, digit2, result);
 
@@ -298,7 +298,7 @@ int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
  * Prints the result of the multiplication of several integers or floating point numbers
  * Returns 1 if successful, 0 otherwise
  */
-int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	float result = 1;
 
 	//digit stands for the current argument being processed
@@ -322,7 +322,7 @@ int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 	if(IsFloat){
 		printf("%f\n", result);
-		*out = result;
+		//*out = result;
 		return 1;
 	}else{
 		printf(RED "Arguments are not numbers.\nUsage: help mul\n" RESET);
@@ -339,7 +339,7 @@ int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
  * Returns 1 if successful, 0 otherwise
  * Assumes the CommandList is properly initialized (ie NULL terminated at least)
  */
-int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 	//Function works only with 0 arguments
 	if(ArgNum == 0){
@@ -373,7 +373,7 @@ int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
-int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 3){
 
 		if(DebugLevel){
@@ -537,7 +537,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
-int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 1){
 
 		if(DebugLevel){
@@ -648,11 +648,11 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	return 1;
 }*/
 
-int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
-	if(ArgNum == 0){
+int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
+	if(ArgNum == 0 || ArgNum == 1){
 
 		if(DebugLevel){
-			sprintf((char*)stringDump, GRN "No arguments detected, correct.\n" RESET);
+			sprintf((char*)stringDump, GRN "0 or 1 argument(s) detected, correct.\n" RESET);
 			WriteConsole((uint8_t*)stringDump);
 		}
 
@@ -664,14 +664,26 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 		uint8_t* tempFname[200];
 		//Buffer to store long file names
 		static TCHAR LongFileNameBuffer[_MAX_LFN];
+		//Cursor used to populate the output structure
+		int fileStructureCursor = 0;
+		int8_t silentMode = 0;
 
+		//Detecting silent mode
+		if(ArgNum == 1 && !strcmp("silent", (char*)ArgStrings[0])){
+			silentMode = 1;
+		}else if(ArgNum == 1){
+			sprintf((char*)stringDump, RED "First argument must be \"silent\".\n" RESET);
+			WriteConsole((uint8_t*)stringDump);
+			return 0;
+		}
 
+		osMutexWait(FSMutexHandle, osWaitForever);
 
 		//Opening current directory and checking for success
 		res = f_opendir(&dir, CwdPath);
 		if(res != FR_OK){
-			sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
-			WriteConsole((uint8_t*)stringDump);
+			if(!silentMode) sprintf((char*)stringDump, RED "FS Error: %s" RESET, fsErrors[res]);
+			if(!silentMode) WriteConsole((uint8_t*)stringDump);
 			return 0;
 		}
 
@@ -708,19 +720,30 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 
 			if (fno.fattrib & AM_DIR) {                     /*It is a directory*/
 				sprintf((char*)stringDump, "| "CYN"Dir"RESET"  |" CYN " %s\n" RESET, (char*)tempFname);
-				WriteConsole((uint8_t*)stringDump);
+				if(!silentMode) WriteConsole((uint8_t*)stringDump);
+
+				//Populating the output structure
+				//strcpy(((FSElement*)out)[fileStructureCursor].PathString, tempFname);
+				//((FSElement*)out)[fileStructureCursor].Type = 2;
+
 			} else {                                        /*It is a file.*/
 				sprintf((char*)stringDump, "| "YEL"File"RESET" | %s", (char*)tempFname);
-				WriteConsole((uint8_t*)stringDump);
+				if(!silentMode) WriteConsole((uint8_t*)stringDump);
+
+				//Populating the output structure
+				//strcpy(((FSElement*)out)[fileStructureCursor].PathString, tempFname);
+				//((FSElement*)out)[fileStructureCursor].Type = 1;
 			}
 
 			if(fno.fsize){
 				sprintf((char*)stringDump, " -- " YEL "%d Bytes\n" RESET, (int)fno.fsize);
-				WriteConsole((uint8_t*)stringDump);
+				if(!silentMode) WriteConsole((uint8_t*)stringDump);
 			}
+			fileStructureCursor++;
 
 		}
 		f_closedir(&dir);
+		osMutexRelease(FSMutexHandle);
 		return 1;
 
 	}else{
@@ -730,7 +753,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
-int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 1){
 
 		if(DebugLevel){
@@ -769,7 +792,7 @@ int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
 	}
 }
 
-int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 1){
 
 		if(DebugLevel){
@@ -817,7 +840,7 @@ int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
  * Copies a file to a destination
  * Widely inspired by http://elm-chan.org/fsw/ff/doc/open.html
  */
-int8_t CpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
+int8_t CpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 2){
 
 		if(DebugLevel){

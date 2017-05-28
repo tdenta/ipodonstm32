@@ -42,6 +42,7 @@ extern osMutexId LCDMutexHandle;
 extern osMutexId audioBufferMutexHandle;
 extern osMutexId serialOutputMutexHandle;
 extern osMutexId DMAControllerMutexHandle;
+extern osMutexId FSMutexHandle;
 extern osMessageQId toneAmplitudeQueueHandle;
 extern osMessageQId toneFrequencyQueueHandle;
 extern osMessageQId ButtonQueueHandle;
@@ -85,19 +86,32 @@ extern void ReadConsole(uint8_t *c);
 #define FILE_BUFFER_SIZE 4
 #define LCD_MODE LEFT_MODE
 
+typedef enum
+{
+	SINGLE_FILE,
+	DIRECTORY
+}FSElementType;
+
+//Structure used to store a path to a file
+typedef struct{
+	int8_t *PathString;
+	int8_t Type;
+} FSElement;
+
 //User structures & global variables
 typedef struct{
 	int8_t *NameString;					//The name of the function
 	int8_t (*Function_p) (
 			uint8_t ArgNum,
 			uint8_t *ArgStrings[],
-			double *out);						//The pointer to the function implementing the command
+			void *out);						//The pointer to the function implementing the command
 	int8_t *HelpString;						//The help message for the function
 } command_s;
 
 typedef struct screen_element_s screen_element_s;
 struct screen_element_s{
 	uint8_t *ElementName;
+	void* specificParameter;
 	float Xorigin;
 	float Yorigin;
 	screen_element_s* neighbors[4];
@@ -142,19 +156,19 @@ uint32_t LCDXSize;
 uint32_t LCDYSize;
 
 //Command functions
-extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t AddFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
-extern int8_t CpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out);
+extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t DebugFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t HelpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t AddFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t DivFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t MulFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
+extern int8_t CpFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
 
 //Button functions
 extern int8_t PlayFunction(uint8_t *s, uint8_t *CurrentButton[]);

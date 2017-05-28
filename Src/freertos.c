@@ -73,6 +73,7 @@ osMessageQId toneAmplitudeQueueHandle;
 osMutexId audioBufferMutexHandle;
 osMutexId serialOutputMutexHandle;
 osMutexId DMAControllerMutexHandle;
+osMutexId FSMutexHandle;
 osSemaphoreId serialOutputSemHandle;
 osTimerId audioPlaybackTimerHandle;
 osSemaphoreId audioOutputSemHandle;
@@ -121,6 +122,10 @@ void MX_FREERTOS_Init(void) {
   osMutexDef(DMAControllerMutex);
   DMAControllerMutexHandle = osMutexCreate(osMutex(DMAControllerMutex));
 
+  osMutexDef(FSMutex);
+  FSMutexHandle = osMutexCreate(osMutex(FSMutex));
+
+  osMutexWait(FSMutexHandle, osWaitForever);//Start with nothing to prevent threads to access FS before proper mounting
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */

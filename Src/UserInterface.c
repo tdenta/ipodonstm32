@@ -18,6 +18,7 @@
 };*/
 const screen_element_s ScreenElementList[] = {
 		{(uint8_t*)"FileLine1",
+				NULL,
 				0.0,
 				0.1,
 				{NULL, NULL, NULL,NULL},
@@ -27,6 +28,7 @@ const screen_element_s ScreenElementList[] = {
 				NULL
 		},
 		{(uint8_t*)"FileLine2",
+				NULL,
 				0.0,
 				0.2,
 				{NULL, NULL, NULL,NULL},
@@ -36,6 +38,7 @@ const screen_element_s ScreenElementList[] = {
 				NULL
 		},
 		{(uint8_t*)"FileLine3",
+				NULL,
 				0.0,
 				0.3,
 				{NULL, NULL, NULL,NULL},
@@ -45,6 +48,7 @@ const screen_element_s ScreenElementList[] = {
 				NULL
 		},
 		{(uint8_t*)"PlayPauseButton",
+				NULL,
 				0.75,
 				0.1,
 				{NULL, NULL, NULL,NULL},
@@ -54,6 +58,7 @@ const screen_element_s ScreenElementList[] = {
 				NULL
 		},
 		{NULL,
+				NULL,
 				0,
 				0,
 				{NULL,NULL,NULL,NULL},
