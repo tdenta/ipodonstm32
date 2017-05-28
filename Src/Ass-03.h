@@ -183,6 +183,7 @@ void UserInterfaceInit(void);
 
 void DrawFileLine(float X, float Y, void* filename);
 void DrawPlayPauseButton(float X, float Y, void* arg);
+void DrawFileSelection(float X, float Y);
 
 
 #endif /* ASS_03_H_ */
