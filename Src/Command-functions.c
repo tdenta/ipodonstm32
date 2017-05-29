@@ -580,6 +580,26 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 			strcpy((char*)pathOfCurrentWorkingDirectory, (char*)CwdBuffer);
 			sprintf((char*)stringDump, GRN "New working directory: %s\n" RESET, (char*)CwdBuffer);
 			if(DebugLevel) WriteConsole((uint8_t*)stringDump);
+
+			//Getting rid of one slash
+
+			//Find last slash position
+			char* LastSlashPosition = strrchr((char*)CwdBuffer, 47);
+
+			//Terminate path at last slash position
+			*LastSlashPosition = '\0';
+
+			//If the path is nothing it means we had only one slash in the path and then the parent is the root folder
+			//Otherwise put the remaining part of the path as parent folder
+			if(strlen((char*)CwdBuffer) != 0){
+				strcpy((char*)pathOfPreviousWorkingDirectory, (char*)CwdBuffer);
+			}else{
+				strcpy((char*)pathOfPreviousWorkingDirectory, (char*)"/");
+			}
+
+			sprintf((char*)stringDump, GRN "New parent directory: %s\n" RESET, (char*)pathOfPreviousWorkingDirectory);
+			if(DebugLevel) WriteConsole((uint8_t*)stringDump);
+
 			return 1;
 		}
 
