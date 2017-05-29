@@ -33,6 +33,8 @@ extern osThreadId myTask03Handle;
 extern osThreadId myTaskCommandLineListenerHandle;
 extern osTimerId myTimer01Handle;
 extern osThreadId audioManagerTaskHandle;
+extern osThreadId UserInterfaceTaskHandle;
+extern osThreadId PlaybackManagerTaskHandle;
 
 extern osSemaphoreId myBinarySem01Handle;
 extern osMessageQId myQueue01Handle;
@@ -61,6 +63,7 @@ extern void Ass_03_Task_03(void const *argument);
 extern void CommandLineListener(void const * argument);
 extern void AudioManager(void const *argument);
 extern void UserInterface(void const *argument);
+extern void PlaybackManager(void const *argument);
 
 // Library functions
 extern void WriteConsole(uint8_t *s);
@@ -182,7 +185,8 @@ extern int32_t audioSecondsRemaining;
 extern uint8_t stringDump[300];
 extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
-extern uint8_t pathOfCurrentWorkingDirectory[300];
+extern uint8_t pathOfCurrentWorkingDirectory[PATH_BUFFER_SIZE];
+extern uint8_t pathOfPreviousWorkingDirectory[PATH_BUFFER_SIZE];
 extern FATFS SDFatFs;
 extern const uint8_t* fsErrors[];
 
@@ -221,6 +225,8 @@ void UserInterfaceInit(void);
 
 extern void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename);
 extern void DrawPlayPauseButton(float X, float Y, SelectionMode Mode, void* arg);
+extern void GenericChangeSelection(JoystickDirection joystickAction);
+extern void CleanFileListArray(void);
 //void DrawFileSelection(float X, float Y);
 
 //UI Processing Functions

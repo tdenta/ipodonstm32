@@ -17,7 +17,7 @@ void WriteConsole(uint8_t *s)
 	//Wait on the serial mutex: avoids conflicts in serial port writing by several threads
 	osMutexWait(serialOutputMutexHandle, osWaitForever);
 
-	status = HAL_UART_Transmit_IT(&huart2, s, strlen(s));
+	status = HAL_UART_Transmit_IT(&huart2, s, strlen((char*)s));
 
 	//The semaphore wait is intended to prevent the thread from getting out of WriteConsole until writing to the serial port is actually done
 	//This semaphore is released in the HAL_UART_TxCpltCallback that is fired when transmission is done

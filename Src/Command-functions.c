@@ -545,6 +545,8 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 			WriteConsole((uint8_t*)stringDump);
 		}
 
+		osMutexWait(FSMutexHandle, osWaitForever);
+
 		//Change working directory
 		res = f_chdir((TCHAR*)ArgStrings[0]);
 
@@ -560,6 +562,8 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 			res = f_getcwd((TCHAR*)CwdBuffer, PATH_BUFFER_SIZE);
 
+			osMutexRelease(FSMutexHandle);
+
 			if(res != FR_OK){
 				sprintf((char*)stringDump, RED "FS Error while reading new cwd: %s" RESET, fsErrors[res]);
 				WriteConsole((uint8_t*)stringDump);
@@ -567,6 +571,10 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 			}
 
 			//Update the path global variable for displaying purposes
+			//Save the previous for the list on screen
+			strcpy((char*)pathOfPreviousWorkingDirectory, (char*)pathOfCurrentWorkingDirectory);
+
+			//Modify the current
 			strcpy((char*)pathOfCurrentWorkingDirectory, (char*)CwdBuffer);
 			sprintf((char*)stringDump, GRN "New working directory: %s\n" RESET, (char*)CwdBuffer);
 			if(DebugLevel) WriteConsole((uint8_t*)stringDump);
@@ -579,74 +587,6 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 		return 0;
 	}
 }
-
-/*int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], double* out){
-
-	static TCHAR LongFileName[_MAX_LFN];
-	static int FolderCount = 0;
-	static int FileCount = 0;
-	TCHAR buff[100];
-
-	if ((res = f_opendir(&dir, "" )) != FR_OK){                                   //Open the current directory
-
-		WriteConsole((uint8_t*)"ERROR: Opening Directory");
-	}
-
-	f_getcwd(buff, (UINT)100);
-	sprintf(stringDump,MAG"%s\n"RESET, buff);
-	WriteConsole((uint8_t*)stringDump);
-	//res = f_opendir(&dir, //SD_Path ); //Open the current directory
-<<<<<<< HEAD
-	sprintf(stringDump,"%s\n", pathOfCurrentWorkingDirectory);
-=======
-	sprintf((char*)stringDump,"%s\n", SD_Path);
->>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
-	WriteConsole((uint8_t*)stringDump);
-
-		for(;;){ // Loop as readdir can only read one entry at a time not a whole directory
-		//while(res == FR_OK  && fno.lfname[0] != 0){
-			fno.lfname = LongFileName;
-			fno.lfsize = _MAX_LFN-1;
-
-			res = f_readdir(&dir, &fno);
-
-<<<<<<< HEAD
-			sprintf(stringDump,RED"%c\n"RESET, fno.fname[0]);
-			WriteConsole((uint8_t*)stringDump);
-			if(res !=  FR_OK ||  fno.lfname[0] == 0) break;
-=======
-			if(res !=  FR_OK || fno.fname[0] == 0) break;
->>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
-
-			if(fno.fname[0] == 0 ){
-				WriteConsole((uint8_t*)fno.fname);
-
-			}else{
-				WriteConsole((uint8_t*)fno.lfname);
-			}
-			if (fno.fattrib & AM_DIR){ //If it is a directory
-				sprintf((char*)stringDump,YEL " (Folder)\n"RESET);
-				WriteConsole((uint8_t *)stringDump);
-				FolderCount++;
-			}else{
-				sprintf((char*)stringDump,YEL " (%d bytes)\n"RESET, fno.fsize);
-				WriteConsole((uint8_t *)stringDump);
-				FileCount++;
-			}
-		}
-<<<<<<< HEAD
-		sprintf(stringDump,RED"%c\n"RESET, fno.fname[0]);
-		WriteConsole((uint8_t*)stringDump);
-		sprintf(stringDump, YEL "Folders: %d\nFiles: %d" RESET, FolderCount, FileCount);
-=======
-		sprintf((char*)stringDump, YEL "Folders: %d\nFiles: %d" RESET, FolderCount, FileCount);
->>>>>>> aa80bc5fdec337a54f6e2b19ccc00c19670da8a8
-		WriteConsole((uint8_t *)stringDump);
-		f_closedir(&dir);
-		FolderCount = 0;
-		FileCount = 0;
-	return 1;
-}*/
 
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 0 || ArgNum == 1){
@@ -723,22 +663,56 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				if(!silentMode) WriteConsole((uint8_t*)stringDump);
 
 				//Populating the output structure. out is a pointer to an array of structures of type FSElement
+				//Only in silent mode in order not to break everything if launched from CLI!!
 				//TODO: check if allocated space is enough for termination characters!
+				if(silentMode){
 
-				//Populate the displayable PathString
-				((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname));
-				strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+					//If the entry is the current directory
+					if(!strcmp(".", (char*)tempFname)){
+						//Populate the displayable PathString
+						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
+						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
 
-				//Populate the element type
-				((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
+						//Populate the element type
+						((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
 
-				//Populate the FullPathString
-				//Allocate memory for base path plus file or folder name
-				((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory));
-				//Copy base path in allocated space
-				strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
-				//Concatenate file or folder name into base path in allocated space
-				strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+						//Populate the FullPathString
+						//Allocate memory for base path only as it is the syntax allowed by fatfs to go to a directory with absolute path
+						((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)pathOfCurrentWorkingDirectory)+1);
+						//Copy base path in allocated space
+						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+
+					}else if(!strcmp("..", (char*)tempFname)){//If the entry is the parent directory
+						//Populate the displayable PathString
+						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
+						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+
+						//Populate the element type
+						((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
+
+						//Populate the FullPathString
+						//Allocate memory for previous base path only as it is the syntax allowed by fatfs to go to a directory with absolute path
+						((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)pathOfPreviousWorkingDirectory)+1);
+						//Copy base path in allocated space
+						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfPreviousWorkingDirectory);
+
+					}else{//If the entry is just a directory
+						//Populate the displayable PathString
+						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
+						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+
+						//Populate the element type
+						((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
+
+						//Populate the FullPathString
+						//Allocate memory for base path plus file or folder name
+						((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+1);
+						//Copy base path in allocated space
+						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+						//Concatenate file or folder name into base path in allocated space
+						strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+					}
+				}
 
 			} else {                                        /*It is a file.*/
 				sprintf((char*)stringDump, "| "YEL"File"RESET" | %s", (char*)tempFname);
@@ -746,21 +720,22 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 				//Populating the output structure. out is a pointer to an array of structures of type FSElement
 				//TODO: check if allocated space is enough for termination characters!
+				if(silentMode){
+					//Populate the displayable PathString
+					((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
+					strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
 
-				//Populate the displayable PathString
-				((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname));
-				strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+					//Populate the element type
+					((FSElement*)out)[fileStructureCursor].Type = SINGLE_FILE;
 
-				//Populate the element type
-				((FSElement*)out)[fileStructureCursor].Type = SINGLE_FILE;
-
-				//Populate the FullPathString
-				//Allocate memory for base path plus file or folder name
-				((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory));
-				//Copy base path in allocated space
-				strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
-				//Concatenate file or folder name into base path in allocated space
-				strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+					//Populate the FullPathString
+					//Allocate memory for base path plus file or folder name
+					((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+1);
+					//Copy base path in allocated space
+					strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+					//Concatenate file or folder name into base path in allocated space
+					strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+				}
 			}
 
 			if(fno.fsize){
@@ -771,8 +746,9 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 		}
 		f_closedir(&dir);
-		//NULL-terminating the structure
+		//NULL-terminating the structure in any case !
 		((FSElement*)out)[fileStructureCursor].PathString = NULL;
+		((FSElement*)out)[fileStructureCursor].FullPathString = NULL;
 		osMutexRelease(FSMutexHandle);
 		return 1;
 
