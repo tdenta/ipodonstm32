@@ -225,9 +225,7 @@ void UserInterfaceInit(void);
 
 
 void DrawStopButton(float X, float Y, SelectionMode Mode,void* arg);
-void DrawCurrentTimeMin(float X, float Y, SelectionMode Mode, void* CurrentTime);
-void DrawCurrentTimeTensOfSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeTensOfSeconds);
-void DrawCurrentTimeSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeSeconds);
+void DrawCurrentTime(float X, float Y, SelectionMode Mode, void* CurrentTime);
 
 extern void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename);
 extern void DrawPlayPauseButton(float X, float Y, SelectionMode Mode, void* arg);

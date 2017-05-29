@@ -187,6 +187,7 @@ void DrawStopButton(float X, float Y, SelectionMode Mode, void* arg){
 	float width = 0.2;
 	float height = 0.2;
 
+	//Converting the percentage into an absolute value with respect to the screen
 	uint16_t absoluteXorigin = (uint16_t)((float)LCDXSize*X);
 	uint16_t absoluteYorigin = (uint16_t)((float)LCDYSize*Y);
 
@@ -197,55 +198,57 @@ void DrawStopButton(float X, float Y, SelectionMode Mode, void* arg){
 	//Stop button width based on button size
 	uint16_t StopSideLength = 0.5*width*(float)LCDYSize;
 
-	//Offsets
+	//Offset from center of the button
 	uint16_t stopOffset = StopSideLength/2;
 
 	osMutexWait(LCDMutexHandle, osWaitForever);
 
-	//BSP_LCD_SetTextColor(LCD_COLOR_LIGHTGRAY); //Colour for box fill
-	//BSP_LCD_FillRect(absoluteXorigin, absoluteYorigin, (uint16_t)(width*(float)LCDXSize),(uint16_t)(height*(float)LCDYSize));
+	//Fill the stop symbol with red colour
 	BSP_LCD_SetTextColor(LCD_COLOR_RED);
 	BSP_LCD_FillRect((absoluteButtonXcenter - stopOffset), (absoluteButtonYcenter - stopOffset) ,StopSideLength, StopSideLength);
 
-	BSP_LCD_SetTextColor(Mode); //Colour for borders
+	//Colour for borders
+	BSP_LCD_SetTextColor(Mode);
 	BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, (uint16_t)(width*(float)LCDXSize),(uint16_t)(height*(float)LCDYSize)); //Drawing the rectangle that represents the button
 	BSP_LCD_DrawRect((absoluteButtonXcenter - stopOffset), (absoluteButtonYcenter - stopOffset) ,StopSideLength, StopSideLength); //Draw stop symbol
 
 	osMutexRelease(LCDMutexHandle);
 }
 
-void DrawCurrentTimeMin(float X, float Y, SelectionMode Mode, void* CurrentTimeMin){
+void DrawCurrentTime(float X, float Y, SelectionMode Mode, void* CurrentTime){
+
+
+	int32_t ElapsedTime = ((uint32_t*)CurrentTime)[0];
+	int32_t TotalTime = ((uint32_t*)CurrentTime)[1];
+	int32_t min[2];
+	int32_t sec[2];
+
+	//Modulus to give the seconds, integer division to give the minutes
+	//Does total time just once the first time to save delay
+	//if(ElapsedTime == 1){
+	sec[0] = TotalTime % 60;
+	min[0] = TotalTime / 60;
+	//}
+	sec[1] = ElapsedTime % 60;
+	min[1] = ElapsedTime / 60;
 
 	osMutexWait(LCDMutexHandle, osWaitForever);
 
 	BSP_LCD_SetFont(&Font16);
-	BSP_LCD_DisplayStringAt(X*(float)LCDXSize, Y*(float)LCDYSize, (uint8_t*)CurrentTimeMin, LEFT_MODE);
+
+	//Again only print remaining tome the first time
+	//if(ElapsedTime == 1){
+	sprintf(stringDump, "%d:%d", (int)min[0], (int)sec[0]);
+	BSP_LCD_DisplayStringAt((X*20 + X*(float)LCDXSize), Y*(float)LCDYSize, stringDump, LEFT_MODE);
+	//}
+
+	sprintf(stringDump, "%d:%d", (int)min[1], (int)sec[1]);
+	BSP_LCD_DisplayStringAt(X*(float)LCDXSize, Y*(float)LCDYSize, stringDump, LEFT_MODE);
 	BSP_LCD_SetFont(&Font12);
 
 	osMutexRelease(LCDMutexHandle);
 }
-void DrawCurrentTimeTensOfSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeTensOfSeconds){
 
-	osMutexWait(LCDMutexHandle, osWaitForever);
-
-	BSP_LCD_SetFont(&Font16);
-	BSP_LCD_DisplayStringAt(X*(float)LCDXSize, Y*(float)LCDYSize, (uint8_t*)CurrentTimeTensOfSeconds, LEFT_MODE);
-	BSP_LCD_SetFont(&Font12);
-
-	osMutexRelease(LCDMutexHandle);
-
-}
-void DrawCurrentTimeSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeSeconds){
-
-	osMutexWait(LCDMutexHandle, osWaitForever);
-
-	BSP_LCD_SetFont(&Font16);
-	BSP_LCD_DisplayStringAt(X*(float)LCDXSize, Y*(float)LCDYSize, (uint8_t*)CurrentTimeSeconds, LEFT_MODE);
-	BSP_LCD_SetFont(&Font12);
-
-	osMutexRelease(LCDMutexHandle);
-
-}
 //void DrawFileSelection(float X, float Y){
 //
 //	// %'s to be replaced with input
