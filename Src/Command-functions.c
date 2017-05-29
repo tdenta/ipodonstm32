@@ -373,13 +373,17 @@ int8_t ListFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	}
 }
 
+/*
+ * Function ToneFunction
+ * Outputs a tone through the DAC using the DMA
+ */
+
 int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 3){
 
 		if(DebugLevel){
 			sprintf((char*)stringDump, GRN "%d arguments correctly detected.\n" RESET, ArgNum);
 			WriteConsole((uint8_t*)stringDump);
-			//osDelay(10);
 		}
 
 		if(IsNumber(ArgStrings[0]) && IsNumber(ArgStrings[1])){
@@ -392,7 +396,6 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 			float ToneFrequency = 0;
 			int ToneVolume = 50;
 			int ToneDuration = 0;
-			//int percent = 0;
 			int lastPlaybackSecond;
 
 			//Convert arguments into numbers
@@ -409,30 +412,12 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				WriteConsole((uint8_t*)stringDump);
 			}
 
+			//Checking for valid parameters
 			if(ToneFrequency >= 0 &&
 					ToneFrequency <= 4000 &&
 					ToneVolume >= 0 &&
 					ToneVolume <=100 &&
 					ToneDuration >= 0){
-
-				/*//Send message to change tone frequency
-			osMessagePut (toneFrequencyQueueHandle, ToneFrequency, 0);
-
-			//Send message to change tone volume
-			osMessagePut (toneAmplitudeQueueHandle, ToneVolume, 0);
-
-			//Wait a number of seconds specified by ToneDuration and print every percent
-			while(percent++ < 100){
-				osDelay(floor(ToneDuration*10));
-				WriteConsole((uint8_t*)"#");
-			}
-
-			continueReadingFlag = 0;
-			//Send message to end audio output (put zero frequency)
-			osMessagePut (toneFrequencyQueueHandle, 0, 0);
-
-			//Send message to put zero volume
-			osMessagePut (toneAmplitudeQueueHandle, 0, 0);*/
 
 				//Convert ToneVolume from percents to 16 bit signed values, maximum is 32,767
 				ToneVolume = (int)(float)(((float)ToneVolume/100)*32767);
@@ -448,7 +433,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 					WriteConsole((uint8_t*)stringDump);
 				}
 
-				//Audio buffers declared as global
+				//Audio buffers declared as global. Here we initialize the first pointers of the dual buffer system
 				int16_t* previousBufferPtr = audioBuffer01;
 				int16_t* currentBufferPtr = audioBuffer01;
 
@@ -461,7 +446,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				//Waiting for DMA to be released by another thread
 				osMutexWait(DMAControllerMutexHandle, osWaitForever);
 
-				//Signalling that DMA should be activated
+				//Signalling that DMA should be activated to the audioManagerTask
 				osSignalSet(audioManagerTaskHandle, 0x01);
 
 				//Immediate signal clear to avoid trying to restart the DMA again
@@ -472,6 +457,7 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				audioSecondsRemaining = ToneDuration;
 				lastPlaybackSecond = audioSecondsRemaining;
 
+				//Printing initial seconds counter
 				sprintf((char*)stringDump, "%d s ... \n", lastPlaybackSecond);
 				WriteConsole((uint8_t*)stringDump);
 
@@ -482,7 +468,10 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				osTimerStart(audioPlaybackTimerHandle, 1000);
 
 				//The main idea is that the next buffer to play should always be available BEFORE the DMA fires the callback telling it's done with current data
+				//This loop is executed everytime the semaphore is released by the DMA callback
 				while(audioSecondsRemaining>0){
+
+					//Swap buffers
 					if(previousBufferPtr == audioBuffer01){
 						currentBufferPtr = audioBuffer02;
 					}else if(previousBufferPtr == audioBuffer02){
@@ -498,15 +487,17 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 					//Sending the pointer for the next buffer to the audio manager
 					osMessagePut(audioOutputQueueHandle, (int)currentBufferPtr, 0);
 
+					//Save last buffer pointer
 					previousBufferPtr = currentBufferPtr;
 
+					//Output the time remaining only when a full second has elapsed
 					if(lastPlaybackSecond != audioSecondsRemaining){
 						sprintf((char*)stringDump, "%d s ... \n", (int)audioSecondsRemaining);
 						WriteConsole((uint8_t*)stringDump);
 						lastPlaybackSecond = audioSecondsRemaining;
 					}
 
-					//Wait for the end of playback for the last buffer
+					//Wait for the end of playback for the last buffer to loop again
 					osSemaphoreWait(audioOutputSemHandle, osWaitForever);
 
 				}
@@ -537,6 +528,12 @@ int8_t ToneFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	}
 }
 
+/*
+ * Function CdFunction
+ * Changes the current working directory
+ * Used by both CLI and UI
+ */
+
 int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 1){
 
@@ -546,6 +543,15 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 		}
 
 		osMutexWait(FSMutexHandle, osWaitForever);
+
+		//sprintf((char*)stringDump, "Attempting to change directory with argument %s.\n" RESET, ArgStrings[0]);
+		//WriteConsole((uint8_t*)stringDump);
+
+		//Save the previous path of cwd to be able to go back in hierarchy on screen
+		//Creating a buffer for getcwd, forced to use cwd to avoid circular reference
+		TCHAR* OldCwdBuffer[PATH_BUFFER_SIZE];
+		f_getcwd((TCHAR*)OldCwdBuffer, PATH_BUFFER_SIZE);
+		strcpy((char*)pathOfPreviousWorkingDirectory, (char*)OldCwdBuffer);
 
 		//Change working directory
 		res = f_chdir((TCHAR*)ArgStrings[0]);
@@ -570,11 +576,7 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				return 0;
 			}
 
-			//Update the path global variable for displaying purposes
-			//Save the previous for the list on screen
-			strcpy((char*)pathOfPreviousWorkingDirectory, (char*)pathOfCurrentWorkingDirectory);
-
-			//Modify the current
+			//Modify the current working directory global variable, used by ls function to populate the file object array
 			strcpy((char*)pathOfCurrentWorkingDirectory, (char*)CwdBuffer);
 			sprintf((char*)stringDump, GRN "New working directory: %s\n" RESET, (char*)CwdBuffer);
 			if(DebugLevel) WriteConsole((uint8_t*)stringDump);
@@ -588,6 +590,10 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	}
 }
 
+/*
+ * Function LsFunction
+ * Lists the files in the current working directory
+ */
 int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 0 || ArgNum == 1){
 
@@ -629,6 +635,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 		if(DebugLevel) WriteConsole((uint8_t*)"Current directory opened.\n");
 
+		//Loop over the dir structure
 		for (;;) {
 
 			//Declaring memory for the long file names as the driver does not do it for us
@@ -667,22 +674,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				//TODO: check if allocated space is enough for termination characters!
 				if(silentMode){
 
-					//If the entry is the current directory
-					if(!strcmp(".", (char*)tempFname)){
-						//Populate the displayable PathString
-						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
-						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
-
-						//Populate the element type
-						((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
-
-						//Populate the FullPathString
-						//Allocate memory for base path only as it is the syntax allowed by fatfs to go to a directory with absolute path
-						((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)pathOfCurrentWorkingDirectory)+1);
-						//Copy base path in allocated space
-						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
-
-					}else if(!strcmp("..", (char*)tempFname)){//If the entry is the parent directory
+					if(!strcmp("..", (char*)tempFname)){//If the entry is the parent directory
 						//Populate the displayable PathString
 						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
 						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
@@ -696,7 +688,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 						//Copy base path in allocated space
 						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfPreviousWorkingDirectory);
 
-					}else{//If the entry is just a directory
+					}else if(strcmp(".", (char*)tempFname)){//If the entry is just a directory, not the current one
 						//Populate the displayable PathString
 						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
 						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
@@ -705,12 +697,34 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 						((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
 
 						//Populate the FullPathString
-						//Allocate memory for base path plus file or folder name
-						((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+1);
-						//Copy base path in allocated space
-						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
-						//Concatenate file or folder name into base path in allocated space
-						strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+						//WARNING: different cases apply if the current directory is the root or not
+
+						//Case 1: current directory is root directory
+						if(!strcmp((char*)pathOfCurrentWorkingDirectory, "/")){
+							//Allocate memory for base path plus file or folder name
+							((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+1);
+							//Copy base path in allocated space
+							strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+							//Concatenate file or folder name into base path in allocated space
+							strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+
+						//Case 2: current directory is not root directory
+						}else{
+							//Allocate memory for base path PLUS SLASH plus file or folder name
+							((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+2);
+							//Copy base path in allocated space
+							strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+							//Concatenate slash into base path in allocated space
+							strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)"/");
+							//Concatenate file or folder name into base path plus slash in allocated space
+							strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+						}
+
+
+
+					}else if(!strcmp(".", (char*)tempFname)){//If the entry is the current directory
+						//Decrement the cursor to compensate increment and fill the spot anyway in the array
+						fileStructureCursor--;
 					}
 				}
 
@@ -759,6 +773,10 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	}
 }
 
+/*
+ * Function MkdirFunction
+ * Creates a new directory
+ */
 int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 1){
 
@@ -798,6 +816,10 @@ int8_t MkdirFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	}
 }
 
+/*
+ * Function RmFunction
+ * Deletes a file or directory
+ */
 int8_t RmFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 	if(ArgNum == 1){
 

@@ -59,6 +59,7 @@ FATFS SDFatFs;
 //Variable to say if file system was mounted correctly
 FRESULT fileSystemMounted;
 
+//Path of working directories used only by graphical user interface
 uint8_t pathOfCurrentWorkingDirectory[PATH_BUFFER_SIZE];
 uint8_t pathOfPreviousWorkingDirectory[PATH_BUFFER_SIZE];
 
@@ -322,6 +323,7 @@ int8_t IsFloatNumber(uint8_t* string){
 
 /*
  * Function SDCardInit
+ * Initializes SD Card and mounts file system
  *Returns 1 if success, 0 otherwise
  */
 int8_t SDCardInit(void){
@@ -349,6 +351,7 @@ int8_t SDCardInit(void){
 		//Update the path global variable for displaying purposes
 		strcpy((char*)pathOfCurrentWorkingDirectory, (char*)"/");
 
+		//Release the mutex to tell all threads the filesystem is ready
 		osMutexRelease(FSMutexHandle);
 
 		return 1;

@@ -3,19 +3,14 @@
  *
  *  Created on: 27 May 2017
  *      Author: c3183034
+ *
+ *      Management of the user interface
  */
 
 
 #include "Ass-03.h"
 
-/*const ButtonFuncs ButtonList[] = {
-		{(int8_t*) "play", &PlayFunction},
-		{(int8_t*) "back", &BackFunction},
-		{(int8_t*) "fwd", &FwdFunction},
-		{(int8_t*) "playslct", &PlaySlctFunction},
-		{(int8_t*) "playlist", &PlayListFunction},
-		{NULL,NULL}
-};*/
+//Array of screen elements that defines the screen layout and state
 screen_element_s ScreenElementList[] = {
 		{(uint8_t*)"FileLine1",
 				NULL,
@@ -24,8 +19,7 @@ screen_element_s ScreenElementList[] = {
 				0.1,
 				{NULL, NULL, &(ScreenElementList[1]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine2",
 				NULL,
@@ -34,9 +28,7 @@ screen_element_s ScreenElementList[] = {
 				0.2,
 				{NULL, &(ScreenElementList[0]), &(ScreenElementList[2]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine3",
 				NULL,
@@ -45,9 +37,7 @@ screen_element_s ScreenElementList[] = {
 				0.3,
 				{NULL, &(ScreenElementList[1]), &(ScreenElementList[3]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine4",
 				NULL,
@@ -56,9 +46,7 @@ screen_element_s ScreenElementList[] = {
 				0.4,
 				{NULL, &(ScreenElementList[2]), &(ScreenElementList[4]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine5",
 				NULL,
@@ -67,9 +55,7 @@ screen_element_s ScreenElementList[] = {
 				0.5,
 				{NULL, &(ScreenElementList[3]), &(ScreenElementList[5]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine6",
 				NULL,
@@ -78,9 +64,7 @@ screen_element_s ScreenElementList[] = {
 				0.6,
 				{NULL, &(ScreenElementList[4]), &(ScreenElementList[6]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine7",
 				NULL,
@@ -89,9 +73,7 @@ screen_element_s ScreenElementList[] = {
 				0.7,
 				{NULL, &(ScreenElementList[5]), NULL,NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"PlayPauseButton",
 				NULL,
@@ -100,8 +82,6 @@ screen_element_s ScreenElementList[] = {
 				0.1,
 				{NULL, NULL, NULL,NULL},
 				&DrawPlayPauseButton,
-				NULL,
-				NULL,
 				NULL
 		},
 		{(uint8_t*)"StopButton",
@@ -111,8 +91,6 @@ screen_element_s ScreenElementList[] = {
 				0.35,
 				{NULL, NULL, NULL,NULL},
 				&DrawStopButton,
-				NULL,
-				NULL,
 				NULL
 		},
 		{(uint8_t*)"CurrentTimeMin",
@@ -122,8 +100,6 @@ screen_element_s ScreenElementList[] = {
 				0.9,
 				{NULL, NULL, NULL,NULL},
 				&DrawCurrentTime,
-				NULL,
-				NULL,
 				NULL
 		},
 		{NULL,
@@ -133,20 +109,19 @@ screen_element_s ScreenElementList[] = {
 				0,
 				{NULL,NULL,NULL,NULL},
 				NULL,
-				NULL,
-				NULL,
 				NULL
 		}
 };
 
+//Pointer to the current selection, global variable, widely used
 screen_element_s* currentlySelectedElement;
-
+//JoystickPosition used to store the message coming from the queue
 JoystickDirection joystickPosition;
-
 osEvent event;
-//joyId[5] = {"Left","Up","Down","Right","Center"};
-int i = 0;
 
+//int i = 0;
+
+//Variables used to draw screen elements, relative values are related to absolute screen dimensions
 uint32_t LCDXSize;
 uint32_t LCDYSize;
 
@@ -162,8 +137,9 @@ void UserInterface(void const * argument){
 	      }
 
 	      sprintf((char*)stringDump, "Joystick event detected: %d\n", (int)joystickPosition);
-	      WriteConsole((uint8_t*)stringDump);
+	      if(DebugLevel) WriteConsole((uint8_t*)stringDump);
 
+	      //Call the element function with the joystick position to trigger an action
 	      currentlySelectedElement->ElementFunction_p(joystickPosition);
 
 	  }
