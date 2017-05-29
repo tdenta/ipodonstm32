@@ -160,6 +160,7 @@ struct screen_element_s{
 
 // ------- User global variables  -------
 
+extern uint8_t DebugLevel;
 extern const command_s CommandList[];
 extern screen_element_s ScreenElementList[];
 extern screen_element_s* currentlySelectedElement;
