@@ -3,19 +3,14 @@
  *
  *  Created on: 27 May 2017
  *      Author: c3183034
+ *
+ *      Management of the user interface
  */
 
 
 #include "Ass-03.h"
 
-/*const ButtonFuncs ButtonList[] = {
-		{(int8_t*) "play", &PlayFunction},
-		{(int8_t*) "back", &BackFunction},
-		{(int8_t*) "fwd", &FwdFunction},
-		{(int8_t*) "playslct", &PlaySlctFunction},
-		{(int8_t*) "playlist", &PlayListFunction},
-		{NULL,NULL}
-};*/
+//Array of screen elements that defines the screen layout and state
 screen_element_s ScreenElementList[] = {
 		{(uint8_t*)"FileLine1",
 				NULL,
@@ -136,14 +131,15 @@ screen_element_s ScreenElementList[] = {
 		}
 };
 
+//Pointer to the current selection, global variable, widely used
 screen_element_s* currentlySelectedElement;
-
+//JoystickPosition used to store the message coming from the queue
 JoystickDirection joystickPosition;
-
 osEvent event;
-//joyId[5] = {"Left","Up","Down","Right","Center"};
-int i = 0;
 
+//int i = 0;
+
+//Variables used to draw screen elements, relative values are related to absolute screen dimensions
 uint32_t LCDXSize;
 uint32_t LCDYSize;
 
@@ -159,8 +155,9 @@ void UserInterface(void const * argument){
 	      }
 
 	      sprintf((char*)stringDump, "Joystick event detected: %d\n", (int)joystickPosition);
-	      WriteConsole((uint8_t*)stringDump);
+	      if(DebugLevel) WriteConsole((uint8_t*)stringDump);
 
+	      //Call the element function with the joystick position to trigger an action
 	      currentlySelectedElement->ElementFunction_p(joystickPosition);
 
 	  }

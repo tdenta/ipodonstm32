@@ -4,41 +4,38 @@
 
 #include "Ass-03.h"
 
-//
-// REPLACE THE EXAMPLE CODE WITH YOUR CODE
-//
-
+//Dump string used for console printing
 uint8_t stringDump[300] = {0};
 
 void CommandLineListener(void const * argument)
 {
+	//Initialize the SD card and check for success
 	if(SDCardInit()){
 		WriteConsole((uint8_t*)GRN"SD Card successfully initialized.\n"RESET);
 	}else{
 		WriteConsole((uint8_t*)RED"SD Card init failed.\n"RESET);
 	}
 
+	//Execute CLI init
 	CommandLineParserInit();
 
 	//Initialize the buffer for typing commands
-	//Array of chars
 	int8_t buffer[BUFFER_MAX_SIZE] = {0};
 	//Cursor intended to keep track of the insertion point for new characters coming
 	int8_t BufferCursor = 0;
 
 	while (1)
 	{
+		//Character received from the serial port
 		uint8_t c;
-
-		//Next section of the code: fill the buffer with received characters from UART
 
 		//ReadConsole is interrupt driven: the thread will stop executing itself here and wait for characters to come (no polling anymore)
 		ReadConsole(&c);
 
-		//Print back the character being read
+		//Print back the character being read using this buffer
 		char prt1[2];
 
-		//0x7f is backspace
+		//0x7f is backspace, we print back the character only if it is not a backspace or if we are not at the beginning of the line
 		if ((BufferCursor != 0) || (c != 0x7f))
 		{
 			sprintf(prt1,"%c",c);
@@ -104,6 +101,7 @@ void CommandLineListener(void const * argument)
 			//printf("Got the output: %f and error code %d \n", output, ErrorCode);
 		}else if(c == 0x7f){ //Check for backspace and start of buffer
 
+			//Remove characters from buffer
 			if (BufferCursor != 0){
 				BufferCursor--;
 			}

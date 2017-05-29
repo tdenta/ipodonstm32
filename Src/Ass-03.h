@@ -30,30 +30,32 @@
 extern osThreadId defaultTaskHandle;
 extern osThreadId myTask02Handle;
 extern osThreadId myTask03Handle;
-extern osThreadId myTaskCommandLineListenerHandle;
 extern osTimerId myTimer01Handle;
-extern osThreadId audioManagerTaskHandle;
-extern osThreadId UserInterfaceTaskHandle;
-extern osThreadId PlaybackManagerTaskHandle;
 
 extern osSemaphoreId myBinarySem01Handle;
 extern osMessageQId myQueue01Handle;
 extern osMutexId LCDMutexHandle;
 
-//User OS Handles
+//-----------User-specific OS Handles-------------
 extern osMutexId audioBufferMutexHandle;
 extern osMutexId serialOutputMutexHandle;
 extern osMutexId DMAControllerMutexHandle;
 extern osMutexId FSMutexHandle;
+
 extern osMessageQId toneAmplitudeQueueHandle;
 extern osMessageQId toneFrequencyQueueHandle;
 extern osMessageQId ButtonQueueHandle;
-extern osSemaphoreId serialOutputSemHandle;
-
-extern osTimerId audioPlaybackTimerHandle;
-extern osSemaphoreId audioOutputSemHandle;
 extern osMessageQId audioOutputQueueHandle;
 
+extern osSemaphoreId serialOutputSemHandle;
+extern osSemaphoreId audioOutputSemHandle;
+
+extern osThreadId audioManagerTaskHandle;
+extern osThreadId UserInterfaceTaskHandle;
+extern osThreadId PlaybackManagerTaskHandle;
+extern osThreadId myTaskCommandLineListenerHandle;
+
+extern osTimerId audioPlaybackTimerHandle;
 
 // Assignment tasks
 extern void Ass_03_Task_01(void const *argument);
@@ -91,7 +93,7 @@ extern void ReadConsole(uint8_t *c);
 #define FILE_BUFFER_SIZE 4
 #define LCD_MODE LEFT_MODE
 
-// ------- User structures & global variables -------
+// ------- User structures  -------
 
 //This enum enables easy management of joystick positions
 typedef enum{
@@ -156,6 +158,8 @@ struct screen_element_s{
 	void (*ElementFunction_p)(JoystickDirection JoystickAction);
 };
 
+// ------- User global variables  -------
+
 extern const command_s CommandList[];
 extern screen_element_s ScreenElementList[];
 extern screen_element_s* currentlySelectedElement;
@@ -164,21 +168,6 @@ extern screen_element_s* upperNeighbor;
 extern screen_element_s* lowerNeighbor;
 extern screen_element_s* rightNeighbor;
 extern screen_element_s* leftNeighbor;
-
-//User functions prototypes
-
-//Command line processing functions
-extern void CommandLineParserInit(void);
-extern void CommandLineParserProcess(void);
-
-extern int string_parser(char *inp, char **array_of_words[]);
-extern const command_s* GetCommandByName(int8_t CommandName[]);
-extern int8_t IsNumber(uint8_t* string);
-extern int8_t IsFloatNumber(uint8_t* string);
-
-extern int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]);
-
-extern int8_t SDCardInit(void);
 
 extern int8_t continueReadingFlag;
 extern int32_t audioSecondsRemaining;
@@ -196,6 +185,21 @@ extern FIL fsrc, fdst;      /* File objects */
 //UI drawing variables
 uint32_t LCDXSize;
 uint32_t LCDYSize;
+
+//-------User functions prototypes-------
+
+//Command line processing & system init functions
+extern void CommandLineParserInit(void);
+extern void CommandLineParserProcess(void);
+
+extern int string_parser(char *inp, char **array_of_words[]);
+extern const command_s* GetCommandByName(int8_t CommandName[]);
+extern int8_t IsNumber(uint8_t* string);
+extern int8_t IsFloatNumber(uint8_t* string);
+
+extern int8_t ProcessArgString(double *out, uint8_t ArgCount, uint8_t *ArgsArray[]);
+
+extern int8_t SDCardInit(void);
 
 //Command functions
 extern int8_t SubFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out);
@@ -219,11 +223,9 @@ extern int8_t FwdFunction(uint8_t *s, uint8_t *CurrentButton[]);
 extern int8_t PlaySlctFunction(uint8_t *s, uint8_t *CurrentButton[]);
 extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
 
-//UI drawing functions
+// UI drawing functions
 
 void UserInterfaceInit(void);
-
-
 void DrawStopButton(float X, float Y, SelectionMode Mode,void* arg);
 void DrawCurrentTimeMin(float X, float Y, SelectionMode Mode, void* CurrentTime);
 void DrawCurrentTimeTensOfSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeTensOfSeconds);
@@ -231,11 +233,11 @@ void DrawCurrentTimeSeconds(float X, float Y, SelectionMode Mode, void* CurrentT
 
 extern void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename);
 extern void DrawPlayPauseButton(float X, float Y, SelectionMode Mode, void* arg);
+
+
+// UI Processing Functions
 extern void GenericChangeSelection(JoystickDirection joystickAction);
 extern void CleanFileListArray(void);
-
-//UI Processing Functions
-
 extern void ProcessFileLine(JoystickDirection joystickAction);
 
 #endif /* ASS_03_H_ */

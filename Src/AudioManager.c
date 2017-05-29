@@ -3,6 +3,8 @@
  *
  *  Created on: 23 May 2017
  *      Author: c3276757
+ *
+ *      Manages the output of buffers through the DAC with the DMA
  */
 
 #include "Ass-03.h"
@@ -49,7 +51,7 @@ void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 		bufferToPlayPtr = (int16_t*) event.value.v;
 	}
 
-	//Continue only if the instruction was given to do so
+	//And we continue transmitting, but only if the instruction was given to do so (that is to say the pointer passed is not NULL)
 	if(bufferToPlayPtr){
 		HAL_I2S_Transmit_DMA(&hi2s2, (uint16_t *)bufferToPlayPtr, AUDIO_BUFFER_SIZE);
 	}
