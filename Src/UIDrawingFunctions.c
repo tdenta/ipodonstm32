@@ -9,6 +9,11 @@
 
 #include "Ass-03.h"
 
+//Room is provided for 30 files, for more, dynamic allocation has to be implemented
+//This program will crash if more than 30 files are in the folder
+//TODO: modify ls function to allow dynamic allocation
+FSElement FileList [30];
+
 void UserInterfaceInit(void){
 
 	//Mutex this part to prevent other threads from drawing while LCD is not yet initialized
@@ -25,58 +30,58 @@ void UserInterfaceInit(void){
 	LCDXSize = BSP_LCD_GetXSize();
 	LCDYSize = BSP_LCD_GetYSize();
 
-	int i = 0;
-	SelectionMode Mode = REGULAR;
-
-	//Room is provided for 30 files, for more, dynamic allocation has to be implemented
-	//This program will crash if more than 30 files are in the folder
-	//TODO: modify ls function to allow dynamic allocation
-	FSElement FileList [30];
+	//Retrieving files from SD Card
 
 	//Find ls command
-	/*const command_s* Ls_command_p = GetCommandByName((int8_t*)"ls");*/
+	const command_s* Ls_command_p = GetCommandByName((int8_t*)"ls");
+	int i = 0;
+	currentlySelectedElement = &(ScreenElementList[0]);
 
 	//Execute it with silent argument and FileList to populate
 	//No need for mutex since the ls function already contains a mutex
-	/*Ls_command_p->Function_p(1, (uint8_t*[]){(uint8_t*)"silent"}, (void*)&FileList);*/
+	Ls_command_p->Function_p(1, (uint8_t*[]){(uint8_t*)"silent"}, (void*)&FileList);
 
 	//Debug output for filelist
-/*	int j = 0;
+	int j = 0;
 	while(FileList[j].PathString != NULL){
 		WriteConsole((uint8_t*)FileList[j].PathString);
 		WriteConsole((uint8_t*)"\n");
 		j++;
 	}
-*/
-	char* words[] = {"File1", "File2", "File3", "File4", "File5", "File6", "File7","Play", "Stop", "3:", "5", "1"};
 
 	while(ScreenElementList[i].ElementName != NULL){
-		//Update specific parameter which is a POINTER on void
-		/*if(ScreenElementList[i].ElementType == LIST_ITEM){
+		//Update specific parameter which is a POINTER on void, with the structures retrieved by ls command
+		if(ScreenElementList[i].ElementType == LIST_ITEM){
 			ScreenElementList[i].specificParameter = (void*)&(FileList[i]);
-		}*/
+		}
 
-		ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, Mode, words[i]/*((FSElement*)(ScreenElementList[i].specificParameter))->PathString*/);
+		/*((FSElement*)(ScreenElementList[i].specificParameter))->PathString*/
+
+		//If we hit the currently selected element
+		if(currentlySelectedElement == &(ScreenElementList[i])){
+			ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, SELECTED, ScreenElementList[i].specificParameter);
+		}else{
+			ScreenElementList[i].ElementDrawFunction_p(ScreenElementList[i].Xorigin, ScreenElementList[i].Yorigin, REGULAR, ScreenElementList[i].specificParameter);
+		}
 		i++;
 	}
-
 }
 
-void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename){
+void DrawFileLine(float X, float Y, SelectionMode Mode, void* FileElement){
+
+	osMutexWait(LCDMutexHandle, osWaitForever);
 
 	//Saving the previous font used in order to set it back after drawing is finished
 	sFONT* previousFont = BSP_LCD_GetFont();
+	uint16_t previousColor = BSP_LCD_GetTextColor();
 
 	//Relative width and height of the screen element
 	float width = 0.7;
 	float height = 0.1;
 
-	osMutexWait(LCDMutexHandle, osWaitForever);
-
-	BSP_LCD_SetTextColor(Mode);
-
 	//Setting a new font
 	BSP_LCD_SetFont(&Font12);
+	BSP_LCD_SetTextColor(Mode);
 
 	//Calculating the relative height of the text in order to center it in the rectangle
 	float textHeight = (float)Font12.Height/LCDYSize;
@@ -87,15 +92,28 @@ void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename){
 	uint16_t absoluteXorigin = (uint16_t)((float)LCDXSize*X);
 	uint16_t absoluteYorigin = (uint16_t)((float)LCDYSize*Y);
 	uint16_t absoluteTextMargin = (uint16_t)((float)LCDYSize*textMargin);
+	uint16_t absoluteWidth = (uint16_t)(width*(float)LCDXSize);
+	uint16_t absoluteHeight = (uint16_t)(height*(float)LCDYSize);
 
 	//Draw the box that represents the file line
-	BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, (uint16_t)(width*(float)LCDXSize),(uint16_t)(height*(float)LCDYSize));
+	BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, absoluteWidth, absoluteHeight);
 
 	//Display the file name in the center
-	BSP_LCD_DisplayStringAt(absoluteXorigin + absoluteTextMargin, absoluteYorigin + absoluteTextMargin,(uint8_t*) filename, LCD_MODE);
+	BSP_LCD_DisplayStringAt(absoluteXorigin + absoluteTextMargin, absoluteYorigin + absoluteTextMargin,((FSElement*)FileElement)->PathString, LCD_MODE);
+
+	if(Mode == SELECTED){
+		//Draw a square at end of line to make selection clearer
+		BSP_LCD_FillRect(absoluteXorigin+absoluteWidth-absoluteTextMargin-Font12.Height, absoluteYorigin+absoluteHeight-absoluteTextMargin-Font12.Height, Font12.Height,Font12.Height);
+	}else{
+		//Erase square at end of line
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+		BSP_LCD_FillRect(absoluteXorigin+absoluteWidth-absoluteTextMargin-Font12.Height, absoluteYorigin+absoluteHeight-absoluteTextMargin-Font12.Height, Font12.Height,Font12.Height);
+	}
 
 	//Reset the font to its previous value
 	BSP_LCD_SetFont(previousFont);
+	BSP_LCD_SetTextColor(previousColor);
+
 	osMutexRelease(LCDMutexHandle);
 }
 

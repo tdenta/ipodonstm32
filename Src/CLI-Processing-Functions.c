@@ -60,6 +60,7 @@ FATFS SDFatFs;
 FRESULT fileSystemMounted;
 
 uint8_t pathOfCurrentWorkingDirectory[PATH_BUFFER_SIZE];
+uint8_t pathOfPreviousWorkingDirectory[PATH_BUFFER_SIZE];
 
 
 void CommandLineParserInit(void)

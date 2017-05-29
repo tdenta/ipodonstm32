@@ -58,6 +58,7 @@ osThreadId myTask03Handle;
 osThreadId myTaskCommandLineListenerHandle;
 osThreadId audioManagerTaskHandle;
 osThreadId UserInterfaceTaskHandle;
+osThreadId PlaybackManagerTaskHandle;
 osMessageQId myQueue01Handle;
 osMessageQId myQueue01Handle;
 osTimerId myTimer01Handle;
@@ -89,6 +90,7 @@ void StartCommandLineListener(void const *argument);
 void Callback01(void const * argument);
 void AudioPlaybackCallback(void const* argument);
 void StartUserInterfaceTask(void const* argument);
+void StartPlaybackManagerTask(void const * argument);
 
 extern void MX_FATFS_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -185,8 +187,12 @@ void MX_FREERTOS_Init(void) {
    audioManagerTaskHandle = osThreadCreate(osThread(AudioManagerTask), NULL);
 
    /*definition and creation of UserInterface task */
-   osThreadDef(UserInterfaceTask, StartUserInterfaceTask, osPriorityNormal, 0, 512);
+   osThreadDef(UserInterfaceTask, StartUserInterfaceTask, osPriorityRealtime, 0, 512);
    UserInterfaceTaskHandle = osThreadCreate(osThread(UserInterfaceTask), NULL);
+
+   /*definition and creation of PlaybackManager task */
+   osThreadDef(PlaybackManagerTask, StartPlaybackManagerTask, osPriorityHigh, 0, 512);
+   PlaybackManagerTaskHandle = osThreadCreate(osThread(PlaybackManagerTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -260,6 +266,10 @@ void StartAudioManagerTask(void const * argument){
 
 void StartUserInterfaceTask(void const * argument){
 	UserInterface(argument);
+}
+
+void StartPlaybackManagerTask(void const * argument){
+	PlaybackManager(argument);
 }
 
 /* Callback01 function */

@@ -33,6 +33,8 @@ extern osThreadId myTask03Handle;
 extern osThreadId myTaskCommandLineListenerHandle;
 extern osTimerId myTimer01Handle;
 extern osThreadId audioManagerTaskHandle;
+extern osThreadId UserInterfaceTaskHandle;
+extern osThreadId PlaybackManagerTaskHandle;
 
 extern osSemaphoreId myBinarySem01Handle;
 extern osMessageQId myQueue01Handle;
@@ -61,12 +63,15 @@ extern void Ass_03_Task_03(void const *argument);
 extern void CommandLineListener(void const * argument);
 extern void AudioManager(void const *argument);
 extern void UserInterface(void const *argument);
+extern void PlaybackManager(void const *argument);
 
 // Library functions
 extern void WriteConsole(uint8_t *s);
 extern void ReadConsole(uint8_t *c);
 
 //------------------ USER CUSTOM CODE ----------------
+
+// ------- Preprocessor constants -------
 
 //Colors in the terminal (at least UNIX-supported)
 //Source : http://stackoverflow.com/questions/3585846/color-text-in-terminal-applications-in-unix
@@ -86,16 +91,33 @@ extern void ReadConsole(uint8_t *c);
 #define FILE_BUFFER_SIZE 4
 #define LCD_MODE LEFT_MODE
 
+// ------- User structures & global variables -------
+
+//This enum enables easy management of joystick positions
+typedef enum{
+	LEFT = 0,
+	UP = 1,
+	DOWN = 2,
+	RIGHT = 3,
+	CENTER = 4,
+}JoystickDirection;
+
+//This enum is designed to indicate the type of a file system element
+//This way the selection on the screen is aware of what to do when clicking on a file system element
 typedef enum{
 	SINGLE_FILE,
 	DIRECTORY
 }FSElementType;
 
+//This enum is designed to give color codes for selected screen elements and regular screen elements
+//It allows system wide modifications of the color codes (you can even pick your own hexadecimal values if you wish)
 typedef enum{
 	SELECTED =  LCD_COLOR_BLUE,	 //Light blue
 	REGULAR = LCD_COLOR_BLACK		//Black
 }SelectionMode;
 
+//This enum is designed to give an easy to understand type to a screen element object
+//It is used especially to populate the specific argument needed by the file system elements objects
 typedef enum
 {
 	LIST_ITEM,
@@ -103,13 +125,14 @@ typedef enum
 	NONE
 }UIElementType;
 
-//Structure used to store a path to a file
+//Structure used to store a path to a file system element, with its type, displayable path "PathString" and path used in the software "FullPathString"
 typedef struct{
-	int8_t *PathString;
+	uint8_t *PathString;
+	uint8_t *FullPathString;
 	FSElementType Type;
 } FSElement;
 
-//User structures & global variables
+
 typedef struct{
 	int8_t *NameString;					//The name of the function
 	int8_t (*Function_p) (
@@ -130,11 +153,17 @@ struct screen_element_s{
 	void (*ElementDrawFunction_p)(float X, float Y, SelectionMode Mode, void* parameter);
 	//void (*ElementDrawSelectedFunction_p)(float X, float Y);
 	//void (*ElementResetSelectionFunction_p)(float X, float Y);
-	void (*ElementFunction_p)(int8_t JoystickAction);
+	void (*ElementFunction_p)(JoystickDirection JoystickAction);
 };
 
 extern const command_s CommandList[];
 extern screen_element_s ScreenElementList[];
+extern screen_element_s* currentlySelectedElement;
+extern FSElement FileList [30];
+extern screen_element_s* upperNeighbor;
+extern screen_element_s* lowerNeighbor;
+extern screen_element_s* rightNeighbor;
+extern screen_element_s* leftNeighbor;
 
 //User functions prototypes
 
@@ -156,7 +185,8 @@ extern int32_t audioSecondsRemaining;
 extern uint8_t stringDump[300];
 extern int16_t audioBuffer01[AUDIO_BUFFER_SIZE];
 extern int16_t audioBuffer02[AUDIO_BUFFER_SIZE];
-extern uint8_t pathOfCurrentWorkingDirectory[300];
+extern uint8_t pathOfCurrentWorkingDirectory[PATH_BUFFER_SIZE];
+extern uint8_t pathOfPreviousWorkingDirectory[PATH_BUFFER_SIZE];
 extern FATFS SDFatFs;
 extern const uint8_t* fsErrors[];
 
@@ -193,13 +223,19 @@ extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
 
 void UserInterfaceInit(void);
 
-void DrawFileLine(float X, float Y, SelectionMode Mode,void* filename);
-void DrawPlayPauseButton(float X, float Y, SelectionMode Mode,void* arg);
+
 void DrawStopButton(float X, float Y, SelectionMode Mode,void* arg);
 void DrawCurrentTimeMin(float X, float Y, SelectionMode Mode, void* CurrentTime);
 void DrawCurrentTimeTensOfSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeTensOfSeconds);
 void DrawCurrentTimeSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeSeconds);
-//void DrawFileSelection(float X, float Y);
 
+extern void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename);
+extern void DrawPlayPauseButton(float X, float Y, SelectionMode Mode, void* arg);
+extern void GenericChangeSelection(JoystickDirection joystickAction);
+extern void CleanFileListArray(void);
+
+//UI Processing Functions
+
+extern void ProcessFileLine(JoystickDirection joystickAction);
 
 #endif /* ASS_03_H_ */

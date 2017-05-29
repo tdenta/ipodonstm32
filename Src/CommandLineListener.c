@@ -48,7 +48,7 @@ void CommandLineListener(void const * argument)
 		if(BufferCursor == BUFFER_MAX_SIZE-1){//In case of buffer overflow we cannot get the entire command typed
 
 			//PRINT TO CONSOLE
-			sprintf(stringDump,RED"\nBuffer overflow! Type a shorter command!\n"RESET);
+			sprintf((char*)stringDump,RED"\nBuffer overflow! Type a shorter command!\n"RESET);
 			WriteConsole((uint8_t*)stringDump);
 			//END PRINT TO CONSOLE
 
@@ -59,7 +59,7 @@ void CommandLineListener(void const * argument)
 			buffer[0] = '\0';
 			BufferCursor = 0;
 
-			sprintf(stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
+			sprintf((char*)stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
 			WriteConsole((uint8_t*)stringDump);
 			WriteConsole((uint8_t *)" > $  ");
 
@@ -96,7 +96,7 @@ void CommandLineListener(void const * argument)
 			double output=0;
 			int8_t ErrorCode = ProcessArgString(&output, WordCount, (uint8_t**)InputWordsArray);
 
-			sprintf(stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
+			sprintf((char*)stringDump, CYN"\n%s" RESET, pathOfCurrentWorkingDirectory);
 			WriteConsole((uint8_t*)stringDump);
 			WriteConsole((uint8_t *)" > $  ");
 
