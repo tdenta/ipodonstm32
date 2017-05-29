@@ -723,18 +723,44 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				if(!silentMode) WriteConsole((uint8_t*)stringDump);
 
 				//Populating the output structure. out is a pointer to an array of structures of type FSElement
+				//TODO: check if allocated space is enough for termination characters!
+
+				//Populate the displayable PathString
 				((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname));
 				strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+
+				//Populate the element type
 				((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
+
+				//Populate the FullPathString
+				//Allocate memory for base path plus file or folder name
+				((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory));
+				//Copy base path in allocated space
+				strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+				//Concatenate file or folder name into base path in allocated space
+				strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
 
 			} else {                                        /*It is a file.*/
 				sprintf((char*)stringDump, "| "YEL"File"RESET" | %s", (char*)tempFname);
 				if(!silentMode) WriteConsole((uint8_t*)stringDump);
 
 				//Populating the output structure. out is a pointer to an array of structures of type FSElement
+				//TODO: check if allocated space is enough for termination characters!
+
+				//Populate the displayable PathString
 				((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname));
 				strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
+
+				//Populate the element type
 				((FSElement*)out)[fileStructureCursor].Type = SINGLE_FILE;
+
+				//Populate the FullPathString
+				//Allocate memory for base path plus file or folder name
+				((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory));
+				//Copy base path in allocated space
+				strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+				//Concatenate file or folder name into base path in allocated space
+				strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
 			}
 
 			if(fno.fsize){

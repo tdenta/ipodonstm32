@@ -68,6 +68,8 @@ extern void ReadConsole(uint8_t *c);
 
 //------------------ USER CUSTOM CODE ----------------
 
+// ------- Preprocessor constants -------
+
 //Colors in the terminal (at least UNIX-supported)
 //Source : http://stackoverflow.com/questions/3585846/color-text-in-terminal-applications-in-unix
 #define RED   "\x1B[31m"
@@ -86,6 +88,9 @@ extern void ReadConsole(uint8_t *c);
 #define FILE_BUFFER_SIZE 4
 #define LCD_MODE LEFT_MODE
 
+// ------- User structures & global variables -------
+
+//This enum enables easy management of joystick positions
 typedef enum{
 	LEFT = 0,
 	UP = 1,
@@ -94,16 +99,22 @@ typedef enum{
 	CENTER = 4,
 }JoystickDirection;
 
+//This enum is designed to indicate the type of a file system element
+//This way the selection on the screen is aware of what to do when clicking on a file system element
 typedef enum{
 	SINGLE_FILE,
 	DIRECTORY
 }FSElementType;
 
+//This enum is designed to give color codes for selected screen elements and regular screen elements
+//It allows system wide modifications of the color codes (you can even pick your own hexadecimal values if you wish)
 typedef enum{
 	SELECTED =  LCD_COLOR_BLUE,	 //Light blue
 	REGULAR = LCD_COLOR_BLACK		//Black
 }SelectionMode;
 
+//This enum is designed to give an easy to understand type to a screen element object
+//It is used especially to populate the specific argument needed by the file system elements objects
 typedef enum
 {
 	LIST_ITEM,
@@ -111,13 +122,14 @@ typedef enum
 	NONE
 }UIElementType;
 
-//Structure used to store a path to a file
+//Structure used to store a path to a file system element, with its type, displayable path "PathString" and path used in the software "FullPathString"
 typedef struct{
 	uint8_t *PathString;
+	uint8_t *FullPathString;
 	FSElementType Type;
 } FSElement;
 
-//User structures & global variables
+
 typedef struct{
 	int8_t *NameString;					//The name of the function
 	int8_t (*Function_p) (
