@@ -225,11 +225,16 @@ extern int8_t PlayListFunction(uint8_t *s, uint8_t *CurrentButton[]);
 
 void UserInterfaceInit(void);
 
+
+void DrawStopButton(float X, float Y, SelectionMode Mode,void* arg);
+void DrawCurrentTimeMin(float X, float Y, SelectionMode Mode, void* CurrentTime);
+void DrawCurrentTimeTensOfSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeTensOfSeconds);
+void DrawCurrentTimeSeconds(float X, float Y, SelectionMode Mode, void* CurrentTimeSeconds);
+
 extern void DrawFileLine(float X, float Y, SelectionMode Mode, void* filename);
 extern void DrawPlayPauseButton(float X, float Y, SelectionMode Mode, void* arg);
 extern void GenericChangeSelection(JoystickDirection joystickAction);
 extern void CleanFileListArray(void);
-//void DrawFileSelection(float X, float Y);
 
 //UI Processing Functions
 
