@@ -153,8 +153,6 @@ struct screen_element_s{
 	float Yorigin;
 	screen_element_s* neighbors[4];
 	void (*ElementDrawFunction_p)(float X, float Y, SelectionMode Mode, void* parameter);
-	//void (*ElementDrawSelectedFunction_p)(float X, float Y);
-	//void (*ElementResetSelectionFunction_p)(float X, float Y);
 	void (*ElementFunction_p)(JoystickDirection JoystickAction);
 };
 

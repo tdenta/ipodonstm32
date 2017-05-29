@@ -547,6 +547,15 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 
 		osMutexWait(FSMutexHandle, osWaitForever);
 
+		sprintf((char*)stringDump, "Attempting to change directory with argument %s.\n" RESET, ArgStrings[0]);
+		WriteConsole((uint8_t*)stringDump);
+
+		//Save the previous path of cwd to be able to go back in hierarchy on screen
+		//Creating a buffer for getcwd, forced to use cwd to avoid circular reference
+		TCHAR* OldCwdBuffer[PATH_BUFFER_SIZE];
+		f_getcwd((TCHAR*)OldCwdBuffer, PATH_BUFFER_SIZE);
+		strcpy((char*)pathOfPreviousWorkingDirectory, (char*)OldCwdBuffer);
+
 		//Change working directory
 		res = f_chdir((TCHAR*)ArgStrings[0]);
 
@@ -570,11 +579,7 @@ int8_t CdFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				return 0;
 			}
 
-			//Update the path global variable for displaying purposes
-			//Save the previous for the list on screen
-			strcpy((char*)pathOfPreviousWorkingDirectory, (char*)pathOfCurrentWorkingDirectory);
-
-			//Modify the current
+			//Modify the current working directory global variable, used by ls function to populate the file object array
 			strcpy((char*)pathOfCurrentWorkingDirectory, (char*)CwdBuffer);
 			sprintf((char*)stringDump, GRN "New working directory: %s\n" RESET, (char*)CwdBuffer);
 			if(DebugLevel) WriteConsole((uint8_t*)stringDump);
@@ -690,12 +695,30 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 						((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
 
 						//Populate the FullPathString
-						//Allocate memory for base path plus file or folder name
-						((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+1);
-						//Copy base path in allocated space
-						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
-						//Concatenate file or folder name into base path in allocated space
-						strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+						//WARNING: different cases apply if the current directory is the root or not
+
+						//Case 1: current directory is root directory
+						if(!strcmp(pathOfCurrentWorkingDirectory, "/")){
+							//Allocate memory for base path plus file or folder name
+							((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+1);
+							//Copy base path in allocated space
+							strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+							//Concatenate file or folder name into base path in allocated space
+							strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+
+						//Case 2: current directory is not root directory
+						}else{
+							//Allocate memory for base path PLUS SLASH plus file or folder name
+							((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)tempFname)+strlen((char*)pathOfCurrentWorkingDirectory)+2);
+							//Copy base path in allocated space
+							strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
+							//Concatenate slash into base path in allocated space
+							strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)"/");
+							//Concatenate file or folder name into base path plus slash in allocated space
+							strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+						}
+
+
 
 					}else if(!strcmp(".", (char*)tempFname)){//If the entry is the current directory
 						//Decrement the cursor to compensate increment and fill the spot anyway in the array

@@ -24,8 +24,7 @@ screen_element_s ScreenElementList[] = {
 				0.1,
 				{NULL, NULL, &(ScreenElementList[1]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine2",
 				NULL,
@@ -34,9 +33,7 @@ screen_element_s ScreenElementList[] = {
 				0.2,
 				{NULL, &(ScreenElementList[0]), &(ScreenElementList[2]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine3",
 				NULL,
@@ -45,9 +42,7 @@ screen_element_s ScreenElementList[] = {
 				0.3,
 				{NULL, &(ScreenElementList[1]), &(ScreenElementList[3]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine4",
 				NULL,
@@ -56,9 +51,7 @@ screen_element_s ScreenElementList[] = {
 				0.4,
 				{NULL, &(ScreenElementList[2]), &(ScreenElementList[4]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine5",
 				NULL,
@@ -67,9 +60,7 @@ screen_element_s ScreenElementList[] = {
 				0.5,
 				{NULL, &(ScreenElementList[3]), &(ScreenElementList[5]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine6",
 				NULL,
@@ -78,9 +69,7 @@ screen_element_s ScreenElementList[] = {
 				0.6,
 				{NULL, &(ScreenElementList[4]), &(ScreenElementList[6]),NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"FileLine7",
 				NULL,
@@ -89,9 +78,7 @@ screen_element_s ScreenElementList[] = {
 				0.7,
 				{NULL, &(ScreenElementList[5]), NULL,NULL},
 				&DrawFileLine,
-				&ProcessFileLine,
-				NULL,
-				NULL
+				&ProcessFileLine
 		},
 		{(uint8_t*)"PlayPauseButton",
 				NULL,
@@ -100,8 +87,6 @@ screen_element_s ScreenElementList[] = {
 				0.1,
 				{NULL, NULL, NULL,NULL},
 				&DrawPlayPauseButton,
-				NULL,
-				NULL,
 				NULL
 		},
 		{(uint8_t*)"StopButton",
@@ -111,41 +96,33 @@ screen_element_s ScreenElementList[] = {
 				0.35,
 				{NULL, NULL, NULL,NULL},
 				&DrawStopButton,
-				NULL,
-				NULL,
 				NULL
 		},
 		{(uint8_t*)"CurrentTimeMin",
-				NULL,
-				NONE,
+				(void*)"9",
+				BUTTON,
 				0.02,
 				0.9,
 				{NULL, NULL, NULL,NULL},
 				&DrawCurrentTimeMin,
-				NULL,
-				NULL,
 				NULL
 		},
 		{(uint8_t*)"CurrentTimeTensOfSeconds",
-				NULL,
-				NONE,
+				(void*)"5",
+				BUTTON,
 				0.08,
 				0.9,
 				{NULL, NULL, NULL,NULL},
 				&DrawCurrentTimeTensOfSeconds,
-				NULL,
-				NULL,
 				NULL
 		},
 		{(uint8_t*)"CurrentTimeSeconds",
-				NULL,
-				NONE,
+				(void*)"2",
+				BUTTON,
 				0.12,
 				0.9,
 				{NULL, NULL, NULL,NULL},
 				&DrawCurrentTimeSeconds,
-				NULL,
-				NULL,
 				NULL
 		},
 		{NULL,
@@ -154,8 +131,6 @@ screen_element_s ScreenElementList[] = {
 				0,
 				0,
 				{NULL,NULL,NULL,NULL},
-				NULL,
-				NULL,
 				NULL,
 				NULL
 		}
