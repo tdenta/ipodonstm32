@@ -667,22 +667,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 				//TODO: check if allocated space is enough for termination characters!
 				if(silentMode){
 
-					//If the entry is the current directory
-					if(!strcmp(".", (char*)tempFname)){
-						//Populate the displayable PathString
-						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
-						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
-
-						//Populate the element type
-						((FSElement*)out)[fileStructureCursor].Type = DIRECTORY;
-
-						//Populate the FullPathString
-						//Allocate memory for base path only as it is the syntax allowed by fatfs to go to a directory with absolute path
-						((FSElement*)out)[fileStructureCursor].FullPathString = malloc(strlen((char*)pathOfCurrentWorkingDirectory)+1);
-						//Copy base path in allocated space
-						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
-
-					}else if(!strcmp("..", (char*)tempFname)){//If the entry is the parent directory
+					if(!strcmp("..", (char*)tempFname)){//If the entry is the parent directory
 						//Populate the displayable PathString
 						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
 						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
@@ -696,7 +681,7 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 						//Copy base path in allocated space
 						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfPreviousWorkingDirectory);
 
-					}else{//If the entry is just a directory
+					}else if(strcmp(".", (char*)tempFname)){//If the entry is just a directory, not the current one
 						//Populate the displayable PathString
 						((FSElement*)out)[fileStructureCursor].PathString = malloc(strlen((char*)tempFname)+1);
 						strcpy((char*)((FSElement*)out)[fileStructureCursor].PathString, (char*)tempFname);
@@ -711,6 +696,10 @@ int8_t LsFunction(uint8_t ArgNum, uint8_t *ArgStrings[], void* out){
 						strcpy((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)pathOfCurrentWorkingDirectory);
 						//Concatenate file or folder name into base path in allocated space
 						strcat((char*)((FSElement*)out)[fileStructureCursor].FullPathString, (char*)tempFname);
+
+					}else if(!strcmp(".", (char*)tempFname)){//If the entry is the current directory
+						//Decrement the cursor to compensate increment and fill the spot anyway in the array
+						fileStructureCursor--;
 					}
 				}
 

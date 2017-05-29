@@ -106,14 +106,16 @@ typedef enum{
 //This way the selection on the screen is aware of what to do when clicking on a file system element
 typedef enum{
 	SINGLE_FILE,
-	DIRECTORY
+	DIRECTORY,
+	BLANK_LINE
 }FSElementType;
 
 //This enum is designed to give color codes for selected screen elements and regular screen elements
 //It allows system wide modifications of the color codes (you can even pick your own hexadecimal values if you wish)
 typedef enum{
 	SELECTED =  LCD_COLOR_BLUE,	 //Light blue
-	REGULAR = LCD_COLOR_BLACK		//Black
+	REGULAR = LCD_COLOR_BLACK,		//Black
+	CLEAR = LCD_COLOR_WHITE
 }SelectionMode;
 
 //This enum is designed to give an easy to understand type to a screen element object

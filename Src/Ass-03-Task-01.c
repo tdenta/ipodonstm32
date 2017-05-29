@@ -57,8 +57,6 @@ void Ass_03_Task_01(void const * argument)
            osMutexWait(LCDMutexHandle, osWaitForever);
 	   //BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"SET  ",LEFT_MODE);
 	   osMutexRelease(LCDMutexHandle);
-	   //Send message to UI task
-	   osMessagePut(ButtonQueueHandle, i, 0);
         }
         else
         {
@@ -66,6 +64,8 @@ void Ass_03_Task_01(void const * argument)
   	   //BSP_LCD_DisplayStringAt(5,85+i*15, (uint8_t*)"RESET",LEFT_MODE);
     	   osMutexRelease(LCDMutexHandle);
   	  // STEPIEN: Send message to Task 2
+    	   //Send message to UI task
+    	   osMessagePut(ButtonQueueHandle, i, 0);
         }
         p[i]=s[i];
       }

@@ -16,6 +16,7 @@ void ProcessFileLine(JoystickDirection joystickAction){
 	GenericChangeSelection(joystickAction);
 	if(joystickAction == CENTER){
 		if(((FSElement*)currentlySelectedElement->specificParameter)->Type == DIRECTORY){
+				WriteConsole("Click on directory detected\n");
 				//Find cd command
 				const command_s* Cd_command_p = GetCommandByName((int8_t*)"cd");
 
@@ -24,8 +25,21 @@ void ProcessFileLine(JoystickDirection joystickAction){
 				//Pass the path leading to the directory, stored in the currentlySelectedElement object
 				Cd_command_p->Function_p(1, (uint8_t*[]){(uint8_t*)((FSElement*)currentlySelectedElement->specificParameter)->FullPathString}, NULL);
 
+				WriteConsole("Working directory changed\n");
+
+
+/*				int j = 0;
+				//BEFORE cleaning the array of file objects we MUST clean the screen !!
+				while(ScreenElementList[j].ElementType == LIST_ITEM){
+					//Clear the file line first to erase any text that could remain
+					ScreenElementList[j].ElementDrawFunction_p(ScreenElementList[j].Xorigin, ScreenElementList[j].Yorigin, CLEAR, NULL);
+					j++;
+				}*/
+
 				//Clean the file list array
 				CleanFileListArray();
+
+				WriteConsole("Array of files cleaned\n");
 
 				//Retrieving files from SD Card
 
@@ -40,8 +54,17 @@ void ProcessFileLine(JoystickDirection joystickAction){
 				//Reset selection to first item in the folder
 				currentlySelectedElement = &(ScreenElementList[0]);
 
+				//Clear LCD
+				//Mutex this part to prevent other threads from drawing
+				osMutexWait(LCDMutexHandle, osWaitForever);
+				BSP_LCD_Clear(LCD_COLOR_WHITE);
+				BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+				BSP_LCD_SetFont(&Font12);
+				osMutexRelease(LCDMutexHandle);
+
 				//The new file list being populated we can draw the new list on screen
 				while(ScreenElementList[i].ElementName != NULL){
+
 					//Update specific parameter which is a POINTER on void, with the structures retrieved by ls command
 					if(ScreenElementList[i].ElementType == LIST_ITEM){
 						ScreenElementList[i].specificParameter = (void*)&(FileList[i]);
@@ -63,6 +86,7 @@ void ProcessFileLine(JoystickDirection joystickAction){
 /*
  * Function CleanFileList Array
  * Frees the memory reserved for previous file paths and names
+ * Puts NULL pointers to make sure memory can't be retrieved
  * Makes the structure ready to fill again
  */
 void CleanFileListArray(void){
@@ -70,7 +94,12 @@ void CleanFileListArray(void){
 
 		while(FileList[i].PathString != NULL){
 			free(FileList[i].FullPathString);
+			FileList[i].FullPathString = NULL;
 			free(FileList[i].PathString);
+			FileList[i].PathString = NULL;
+
+			FileList[i].Type = BLANK_LINE;
+			i++;
 		}
 }
 

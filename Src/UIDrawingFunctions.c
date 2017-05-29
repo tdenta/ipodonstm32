@@ -83,6 +83,7 @@ void DrawFileLine(float X, float Y, SelectionMode Mode, void* FileElement){
 
 	//Setting a new font
 	BSP_LCD_SetFont(&Font12);
+	//Use the color defined by the mode
 	BSP_LCD_SetTextColor(Mode);
 
 	//Calculating the relative height of the text in order to center it in the rectangle
@@ -97,19 +98,28 @@ void DrawFileLine(float X, float Y, SelectionMode Mode, void* FileElement){
 	uint16_t absoluteWidth = (uint16_t)(width*(float)LCDXSize);
 	uint16_t absoluteHeight = (uint16_t)(height*(float)LCDYSize);
 
-	//Draw the box that represents the file line
-	BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, absoluteWidth, absoluteHeight);
+	if(Mode == REGULAR){
+		//Draw the box that represents the file line
+		BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, absoluteWidth, absoluteHeight);
 
-	//Display the file name in the center
-	BSP_LCD_DisplayStringAt(absoluteXorigin + absoluteTextMargin, absoluteYorigin + absoluteTextMargin,((FSElement*)FileElement)->PathString, LCD_MODE);
+		//Display the file name in the center
+		BSP_LCD_DisplayStringAt(absoluteXorigin + absoluteTextMargin, absoluteYorigin + absoluteTextMargin,((FSElement*)FileElement)->PathString, LCD_MODE);
 
-	if(Mode == SELECTED){
+		//Erase square at end of line to erase possible selection, warning:switch to white
+		BSP_LCD_SetTextColor(CLEAR);
+		BSP_LCD_FillRect(absoluteXorigin+absoluteWidth-absoluteTextMargin-Font12.Height, absoluteYorigin+absoluteHeight-absoluteTextMargin-Font12.Height, Font12.Height,Font12.Height);
+	}else if(Mode == SELECTED){
+		//Draw the box that represents the file line
+		BSP_LCD_DrawRect(absoluteXorigin, absoluteYorigin, absoluteWidth, absoluteHeight);
+
+		//Display the file name in the center
+		BSP_LCD_DisplayStringAt(absoluteXorigin + absoluteTextMargin, absoluteYorigin + absoluteTextMargin,((FSElement*)FileElement)->PathString, LCD_MODE);
+
 		//Draw a square at end of line to make selection clearer
 		BSP_LCD_FillRect(absoluteXorigin+absoluteWidth-absoluteTextMargin-Font12.Height, absoluteYorigin+absoluteHeight-absoluteTextMargin-Font12.Height, Font12.Height,Font12.Height);
-	}else{
-		//Erase square at end of line
-		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-		BSP_LCD_FillRect(absoluteXorigin+absoluteWidth-absoluteTextMargin-Font12.Height, absoluteYorigin+absoluteHeight-absoluteTextMargin-Font12.Height, Font12.Height,Font12.Height);
+	}else if(Mode == CLEAR){
+		//Clear the box that represents the file line with a white filled rectangle
+		BSP_LCD_FillRect(absoluteXorigin, absoluteYorigin, absoluteWidth, absoluteHeight);
 	}
 
 	//Reset the font to its previous value

@@ -187,12 +187,12 @@ void MX_FREERTOS_Init(void) {
    audioManagerTaskHandle = osThreadCreate(osThread(AudioManagerTask), NULL);
 
    /*definition and creation of UserInterface task */
-   osThreadDef(UserInterfaceTask, StartUserInterfaceTask, osPriorityRealtime, 0, 512);
+   osThreadDef(UserInterfaceTask, StartUserInterfaceTask, osPriorityNormal, 0, 512);
    UserInterfaceTaskHandle = osThreadCreate(osThread(UserInterfaceTask), NULL);
 
    /*definition and creation of PlaybackManager task */
-   osThreadDef(PlaybackManagerTask, StartPlaybackManagerTask, osPriorityHigh, 0, 512);
-   PlaybackManagerTaskHandle = osThreadCreate(osThread(PlaybackManagerTask), NULL);
+  /* osThreadDef(PlaybackManagerTask, StartPlaybackManagerTask, osPriorityNormal, 0, 512);
+   PlaybackManagerTaskHandle = osThreadCreate(osThread(PlaybackManagerTask), NULL);*/
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

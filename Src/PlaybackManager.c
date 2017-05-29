@@ -9,6 +9,6 @@
 
 void PlaybackManager(void const * argument){
 	while(1){
-		osDelay(20);
+		osDelay(100);
 	}
 }
